@@ -43,9 +43,22 @@
       overscroll-behavior: none;
     }
     
-    /* Spacer for status bar */
+    /* Spacer for status bar - only in standalone/PWA mode */
     .status-bar-spacer {
-      height: 50px;
+      height: 0px;
+    }
+    
+    @media all and (display-mode: standalone) {
+      .status-bar-spacer {
+        height: 50px;
+      }
+    }
+    
+    /* Also for iOS standalone */
+    @media all and (display-mode: fullscreen) {
+      .status-bar-spacer {
+        height: 50px;
+      }
     }
     
     /* Allow text selection only in input fields */
