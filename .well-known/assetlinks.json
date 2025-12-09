@@ -1,8 +1,0 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "io.github.lamboorg.twa",
-        "sha256_cert_fingerprints": ["0B:87:D1:2B:A1:AD:E3:45:EB:59:7E:E6:9B:EA:42:29:13:B4:B3:91:F1:3C:4E:6F:93:AE:57:4B:89:35:AA:86"]
-      }
-    }]
