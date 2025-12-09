@@ -26,7 +26,6 @@
       min-height: -webkit-fill-available;
       color: white;
       overflow-x: hidden;
-      padding-top: env(safe-area-inset-top, 20px);
       padding-bottom: env(safe-area-inset-bottom, 0px);
       padding-left: env(safe-area-inset-left, 0px);
       padding-right: env(safe-area-inset-right, 0px);
@@ -39,6 +38,12 @@
       -webkit-touch-callout: none;
       -webkit-tap-highlight-color: transparent;
       overscroll-behavior: none;
+    }
+    
+    /* Spacer for status bar */
+    .status-bar-spacer {
+      height: 30px;
+      height: env(safe-area-inset-top, 30px);
     }
     
     /* Allow text selection only in input fields */
@@ -54,7 +59,7 @@
       max-width: 500px;
       margin: 0 auto;
       padding: 20px;
-      padding-top: 40px;
+      padding-top: 15px;
       min-height: 100vh;
     }
     
@@ -774,6 +779,9 @@
 </head>
 <body>
   <div class="container">
+    <!-- Spacer for status bar in overlay mode -->
+    <div class="status-bar-spacer"></div>
+    
     <div class="header">
       <h1>📚 FlashFrame</h1>
       <p>Tap cards to flip • Swipe to navigate</p>
