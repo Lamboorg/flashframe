@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.netlify.lamboorgflashframe.twa",
+        "sha256_cert_fingerprints": ["34:73:50:AB:A2:5F:FF:D5:53:51:74:9F:50:37:BC:18:E2:66:BB:A1:23:10:D2:74:A2:36:DC:F9:99:C6:D8:E1"]
+      }
+    }]
