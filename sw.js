@@ -1,4 +1,4 @@
-const CACHE_NAME = 'flashframe-v17';
+const CACHE_NAME = 'flashframe-v18';
 
 // Install - skip waiting immediately
 self.addEventListener('install', event => {
