@@ -921,7 +921,7 @@ Who wrote Hamlet:William Shakespeare"></textarea>
     </div>
     
     <!-- Footer -->
-    <div class="footer-credit">Made by Lamboorg with ♡</div>
+    <div class="footer-credit">Made by Lamboorg with ♡ • v1.3</div>
     
     <!-- Toast -->
     <div class="toast" id="toast"></div>
@@ -1650,9 +1650,30 @@ Who wrote Hamlet:William Shakespeare"></textarea>
       });
     }
 
-    // Register service worker
+    // Register service worker with force update
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js');
+      navigator.serviceWorker.register('./sw.js').then(registration => {
+        // Check for updates every time page loads
+        registration.update();
+        
+        // When new service worker is found, activate it immediately
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New version available - force activate
+              newWorker.postMessage('skipWaiting');
+              // Reload to get new version
+              window.location.reload();
+            }
+          });
+        });
+      });
+      
+      // Reload when new service worker takes control
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        window.location.reload();
+      });
     }
 
     // Start app

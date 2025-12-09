@@ -1,50 +1,43 @@
-const CACHE_NAME = 'flashframe-v13';
-const urlsToCache = [
-  './',
-  './index.html'
-];
+const CACHE_NAME = 'flashframe-v14';
 
-// Install - cache files
+// Install - skip waiting immediately
 self.addEventListener('install', event => {
-  self.skipWaiting(); // Force activate immediately
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
-  );
+  self.skipWaiting();
 });
 
-// Activate - clear old caches
+// Activate - clear ALL old caches and take control immediately
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName); // Delete old caches
-          }
+          // Delete ALL caches to force fresh content
+          return caches.delete(cacheName);
         })
       );
     }).then(() => {
-      return self.clients.claim(); // Take control immediately
+      return self.clients.claim();
     })
   );
 });
 
-// Fetch - network first, then cache (always gets fresh content)
+// Fetch - ALWAYS go to network first, never serve stale cache
 self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        // Clone and cache the fresh response
-        const responseClone = response.clone();
-        caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, responseClone);
-        });
         return response;
       })
       .catch(() => {
-        // If offline, use cache
+        // Only use cache if completely offline
         return caches.match(event.request);
       })
   );
+});
+
+// Listen for messages to force update
+self.addEventListener('message', event => {
+  if (event.data === 'skipWaiting') {
+    self.skipWaiting();
+  }
 });
