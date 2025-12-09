@@ -17,8 +17,6 @@
     
     html {
       background: #1e1b4b;
-      height: 100%;
-      overflow: hidden;
     }
     
     body {
@@ -26,9 +24,8 @@
       background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 50%, #7c3aed 100%);
       min-height: 100vh;
       min-height: -webkit-fill-available;
-      height: 100%;
       color: white;
-      overflow: hidden;
+      overflow-x: hidden;
       padding-bottom: env(safe-area-inset-bottom, 0px);
       padding-left: env(safe-area-inset-left, 0px);
       padding-right: env(safe-area-inset-right, 0px);
@@ -43,12 +40,7 @@
       overscroll-behavior: none;
     }
     
-    /* Spacer for status bar - controlled by JS */
-    .status-bar-spacer {
-      height: 0px;
-      transition: height 0.1s;
-    }
-    
+
     /* Allow text selection only in input fields */
     input, textarea {
       -webkit-user-select: text;
@@ -63,11 +55,7 @@
       margin: 0 auto;
       padding: 20px;
       padding-top: 15px;
-      height: 100vh;
-      height: -webkit-fill-available;
-      overflow-y: auto;
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
+      min-height: 100vh;
     }
     }
     
@@ -175,12 +163,12 @@
       position: absolute;
       bottom: 15px;
       right: 15px;
-      background: rgba(239, 68, 68, 0.8);
+      background: rgba(239, 68, 68, 0.2);
       border: none;
-      color: white;
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
+      color: #fca5a5;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 1rem;
       display: flex;
@@ -188,21 +176,15 @@
       justify-content: center;
       transition: all 0.3s;
       opacity: 0;
-      pointer-events: none;
-    }
-    
-    .deck-delete-btn[style*="opacity: 1"] {
-      pointer-events: auto;
     }
     
     .deck-card:hover .deck-delete-btn {
       opacity: 1;
-      pointer-events: auto;
     }
     
     .deck-delete-btn:hover {
       background: #ef4444;
-      transform: scale(1.1);
+      color: white;
     }
     
     /* Study View */
@@ -211,16 +193,12 @@
     }
     
     .study-view.active {
-      display: flex;
-      flex-direction: column;
-      height: calc(100vh - 100px);
-      overflow: hidden;
+      display: block;
     }
     
     /* Progress Bar */
     .progress-container {
       margin-bottom: 15px;
-      flex-shrink: 0;
     }
     
     .progress-bar {
@@ -797,9 +775,6 @@
 </head>
 <body>
   <div class="container">
-    <!-- Spacer for status bar in overlay mode -->
-    <div class="status-bar-spacer"></div>
-    
     <div class="header">
       <h1>📚 FlashFrame</h1>
       <p>Tap cards to flip • Swipe to navigate</p>
@@ -1165,7 +1140,7 @@ Who wrote Hamlet:William Shakespeare"></textarea>
         const dueCount = getDueCount(name);
         const escapedName = name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
         return `
-          <div class="deck-card" data-deck="${escapedName}">
+          <div class="deck-card" onclick="startStudy('${escapedName}')">
             <h3>${name}</h3>
             <div class="deck-stats">
               <span>📚 ${cards.length} cards</span>
@@ -1175,50 +1150,6 @@ Who wrote Hamlet:William Shakespeare"></textarea>
           </div>
         `;
       }).join('');
-      
-      // Add long-press and tap handlers to each deck card
-      document.querySelectorAll('.deck-card').forEach(card => {
-        let pressTimer = null;
-        let isLongPress = false;
-        
-        const deckName = card.dataset.deck;
-        
-        card.addEventListener('touchstart', (e) => {
-          isLongPress = false;
-          pressTimer = setTimeout(() => {
-            isLongPress = true;
-            // Show delete button on long press
-            card.querySelector('.deck-delete-btn').style.opacity = '1';
-            if (navigator.vibrate) navigator.vibrate(50);
-          }, 500);
-        });
-        
-        card.addEventListener('touchend', (e) => {
-          clearTimeout(pressTimer);
-          if (!isLongPress) {
-            // Single tap - open flashcard view
-            startStudy(deckName);
-          }
-        });
-        
-        card.addEventListener('touchmove', () => {
-          clearTimeout(pressTimer);
-        });
-        
-        // Mouse support for desktop
-        card.addEventListener('click', (e) => {
-          if (e.target.classList.contains('deck-delete-btn')) return;
-          if (!isLongPress) {
-            startStudy(deckName);
-          }
-          isLongPress = false;
-        });
-        
-        card.addEventListener('contextmenu', (e) => {
-          e.preventDefault();
-          card.querySelector('.deck-delete-btn').style.opacity = '1';
-        });
-      });
     }
     
     function deleteDeck(event, deckName) {
@@ -1722,21 +1653,6 @@ Who wrote Hamlet:William Shakespeare"></textarea>
     // Register service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js');
-    }
-    
-    // Detect if running as standalone app (PWA or WebView)
-    function isStandalone() {
-      return (window.matchMedia('(display-mode: standalone)').matches) ||
-             (window.matchMedia('(display-mode: fullscreen)').matches) ||
-             (window.navigator.standalone === true) ||
-             (window.Android) ||
-             (document.referrer.includes('android-app://')) ||
-             (!window.menubar.visible);
-    }
-    
-    // Add spacer for status bar in app mode
-    if (isStandalone()) {
-      document.querySelector('.status-bar-spacer').style.height = '50px';
     }
 
     // Start app
