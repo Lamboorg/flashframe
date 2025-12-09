@@ -43,22 +43,10 @@
       overscroll-behavior: none;
     }
     
-    /* Spacer for status bar - only in standalone/PWA mode */
+    /* Spacer for status bar - controlled by JS */
     .status-bar-spacer {
       height: 0px;
-    }
-    
-    @media all and (display-mode: standalone) {
-      .status-bar-spacer {
-        height: 50px;
-      }
-    }
-    
-    /* Also for iOS standalone */
-    @media all and (display-mode: fullscreen) {
-      .status-bar-spacer {
-        height: 50px;
-      }
+      transition: height 0.1s;
     }
     
     /* Allow text selection only in input fields */
@@ -1734,6 +1722,21 @@ Who wrote Hamlet:William Shakespeare"></textarea>
     // Register service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js');
+    }
+    
+    // Detect if running as standalone app (PWA or WebView)
+    function isStandalone() {
+      return (window.matchMedia('(display-mode: standalone)').matches) ||
+             (window.matchMedia('(display-mode: fullscreen)').matches) ||
+             (window.navigator.standalone === true) ||
+             (window.Android) ||
+             (document.referrer.includes('android-app://')) ||
+             (!window.menubar.visible);
+    }
+    
+    // Add spacer for status bar in app mode
+    if (isStandalone()) {
+      document.querySelector('.status-bar-spacer').style.height = '50px';
     }
 
     // Start app

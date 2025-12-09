@@ -1,4 +1,4 @@
-const CACHE_NAME = 'flashframe-v10';
+const CACHE_NAME = 'flashframe-v11';
 const urlsToCache = [
   './',
   './index.html'
