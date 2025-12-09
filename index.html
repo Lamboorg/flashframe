@@ -54,15 +54,31 @@
       max-width: 500px;
       margin: 0 auto;
       padding: 20px;
-      padding-top: 15px;
+      padding-top: 25px;
       min-height: 100vh;
     }
+    
+    /* Extra padding for PWA/standalone mode (status bar overlay) */
+    @media all and (display-mode: standalone), all and (display-mode: fullscreen) {
+      .container {
+        padding-top: 60px;
+      }
+    }
+    
+    /* iOS standalone mode */
+    @supports (-webkit-touch-callout: none) {
+      @media all and (display-mode: standalone) {
+        .container {
+          padding-top: 60px;
+        }
+      }
     }
     
     /* Header */
     .header {
       text-align: center;
       margin-bottom: 20px;
+      padding-top: 15px;
     }
     
     .header h1 {
@@ -921,7 +937,7 @@ Who wrote Hamlet:William Shakespeare"></textarea>
     </div>
     
     <!-- Footer -->
-    <div class="footer-credit">Made by Lamboorg with ♡ • v1.3</div>
+    <div class="footer-credit">Made by Lamboorg with ♡ • v1.5</div>
     
     <!-- Toast -->
     <div class="toast" id="toast"></div>
