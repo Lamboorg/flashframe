@@ -811,9 +811,7 @@
       </div>
       
       <div class="controls">
-        <button class="control-btn" onclick="prevCard()" id="prev-btn">◀</button>
         <button class="control-btn" onclick="shuffleCards()" title="Shuffle">🔀</button>
-        <button class="control-btn" onclick="nextCard()" id="next-btn">▶</button>
       </div>
       
       <div class="srs-controls" id="srs-controls">
@@ -855,8 +853,15 @@ Who wrote Hamlet:William Shakespeare"></textarea>
       
       <div class="import-section">
         <h3>📤 Export All Data</h3>
-        <p>Download your flashcards as a backup</p>
+        <p>Backup your flashcards and progress</p>
         <button class="import-btn" onclick="exportData()">Export Data</button>
+      </div>
+      
+      <div class="import-section">
+        <h3>📥 Restore from Backup</h3>
+        <p>Paste your JSON backup data here:</p>
+        <textarea class="import-textarea" id="restore-text" placeholder='Paste your backup JSON here...'></textarea>
+        <button class="import-btn" onclick="restoreBackup()">Restore Backup</button>
       </div>
     </div>
     
@@ -890,7 +895,7 @@ Who wrote Hamlet:William Shakespeare"></textarea>
     </div>
     
     <!-- Footer -->
-    <div class="footer-credit">Made by Daniel J. with ♡</div>
+    <div class="footer-credit">Made by Lamboorg with ♡</div>
     
     <!-- Toast -->
     <div class="toast" id="toast"></div>
@@ -1416,16 +1421,118 @@ Who wrote Hamlet:William Shakespeare"></textarea>
         exportDate: new Date().toISOString()
       };
       
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
+      const jsonString = JSON.stringify(data, null, 2);
+      const filename = `flashframe-backup-${new Date().toISOString().split('T')[0]}.json`;
       
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `flashcards-backup-${new Date().toISOString().split('T')[0]}.json`;
-      a.click();
+      // Try Web Share API first (works on mobile)
+      if (navigator.share && navigator.canShare) {
+        const file = new File([jsonString], filename, { type: 'application/json' });
+        if (navigator.canShare({ files: [file] })) {
+          navigator.share({
+            files: [file],
+            title: 'FlashFrame Backup',
+            text: 'My FlashFrame flashcards backup'
+          }).then(() => {
+            showToast('Data exported! 📤');
+          }).catch((err) => {
+            // If share fails, fallback to copy
+            fallbackExport(jsonString);
+          });
+          return;
+        }
+      }
       
-      URL.revokeObjectURL(url);
-      showToast('Data exported! 📤');
+      // Try standard download
+      try {
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+        URL.revokeObjectURL(url);
+        showToast('Data exported! 📤');
+      } catch (e) {
+        // Fallback to copy method
+        fallbackExport(jsonString);
+      }
+    }
+    
+    function fallbackExport(jsonString) {
+      // Copy to clipboard as fallback
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(jsonString).then(() => {
+          showToast('Data copied to clipboard! 📋 Paste into a .json file');
+        }).catch(() => {
+          showExportModal(jsonString);
+        });
+      } else {
+        showExportModal(jsonString);
+      }
+    }
+    
+    function showExportModal(jsonString) {
+      // Create a modal to display the data
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);z-index:9999;padding:20px;overflow:auto;';
+      modal.innerHTML = `
+        <div style="max-width:500px;margin:0 auto;">
+          <h3 style="color:white;margin-bottom:10px;">📤 Export Data</h3>
+          <p style="color:rgba(255,255,255,0.7);margin-bottom:15px;font-size:0.9rem;">Copy this data and save it as a .json file:</p>
+          <textarea id="export-textarea" style="width:100%;height:300px;padding:10px;border-radius:10px;font-family:monospace;font-size:12px;" readonly>${jsonString}</textarea>
+          <button onclick="copyExportData()" style="width:100%;padding:15px;margin-top:10px;border:none;border-radius:10px;background:#10b981;color:white;font-weight:600;cursor:pointer;">Copy to Clipboard</button>
+          <button onclick="this.parentElement.parentElement.remove()" style="width:100%;padding:15px;margin-top:10px;border:none;border-radius:10px;background:rgba(255,255,255,0.2);color:white;font-weight:600;cursor:pointer;">Close</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+    
+    function copyExportData() {
+      const textarea = document.getElementById('export-textarea');
+      textarea.select();
+      document.execCommand('copy');
+      showToast('Copied to clipboard! 📋');
+    }
+    
+    function restoreBackup() {
+      const text = document.getElementById('restore-text').value.trim();
+      
+      if (!text) {
+        showToast('Please paste your backup data');
+        return;
+      }
+      
+      try {
+        const data = JSON.parse(text);
+        
+        if (!data.decks) {
+          showToast('Invalid backup format');
+          return;
+        }
+        
+        if (confirm('This will replace all your current data. Continue?')) {
+          decks = data.decks;
+          if (data.progress) cardProgress = data.progress;
+          if (data.settings) settings = data.settings;
+          
+          saveDecks();
+          saveProgress();
+          saveSettings();
+          
+          renderDecks();
+          updateSettingsUI();
+          
+          document.getElementById('restore-text').value = '';
+          showToast('Backup restored! 🎉');
+          showView('decks');
+        }
+      } catch (e) {
+        showToast('Invalid JSON format');
+      }
     }
 
     // ============ SETTINGS ============
