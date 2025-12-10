@@ -6,10 +6,8 @@
     <title>FlashFrame - Flashcards with Anki SRS</title>
     <meta name="description" content="Free flashcard app with Anki-style spaced repetition">
     <meta name="theme-color" content="#1e1b4b">
-    <link rel="manifest" href="manifest.json">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         :root {
             --bg-dark: #1e1b4b;
             --bg-purple: #4c1d95;
@@ -22,7 +20,6 @@
             --text-muted: rgba(255,255,255,0.7);
             --card-bg: rgba(255,255,255,0.15);
         }
-        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, var(--bg-dark), var(--bg-purple), var(--accent));
@@ -31,15 +28,64 @@
             padding: 20px;
             padding-bottom: 80px;
         }
-        
         .container { max-width: 600px; margin: 0 auto; }
-        
-        /* Header */
         .header { text-align: center; margin-bottom: 20px; }
         .header h1 { font-size: 28px; margin-bottom: 4px; }
         .header p { font-size: 12px; color: var(--text-muted); }
-        
-        /* Tabs */
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 4px;
+        }
+        .lang-selector {
+            position: relative;
+        }
+        .lang-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .lang-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        .lang-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 8px;
+            background: linear-gradient(135deg, var(--bg-dark), var(--bg-purple));
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            z-index: 100;
+            display: none;
+            min-width: 140px;
+        }
+        .lang-dropdown.show {
+            display: block;
+        }
+        .lang-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+        .lang-option:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .lang-option.active {
+            background: var(--accent);
+        }
         .tabs { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
         .tab {
             padding: 10px 24px;
@@ -53,12 +99,8 @@
         }
         .tab.active { background: white; color: var(--bg-dark); }
         .tab:hover { opacity: 0.9; }
-        
-        /* Views */
         .view { display: none; }
         .view.active { display: block; }
-        
-        /* Cards */
         .card {
             background: var(--card-bg);
             backdrop-filter: blur(10px);
@@ -66,13 +108,10 @@
             padding: 20px;
             margin-bottom: 12px;
         }
-        
         .card-danger {
             background: rgba(239, 68, 68, 0.1);
             border: 1px solid rgba(239, 68, 68, 0.3);
         }
-        
-        /* Deck Item */
         .deck-item {
             display: flex;
             align-items: center;
@@ -93,8 +132,6 @@
         .badge-warning { background: var(--warning); color: #000; }
         .badge-success { background: var(--success); color: #000; }
         .badge-info { background: var(--info); color: #fff; }
-        
-        /* Buttons */
         .btn {
             padding: 12px 24px;
             border-radius: 12px;
@@ -123,8 +160,6 @@
             border-radius: 50%;
             background: var(--card-bg);
         }
-        
-        /* Form */
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
         .form-control {
@@ -139,8 +174,6 @@
         .form-control::placeholder { color: rgba(255,255,255,0.5); }
         .form-control:focus { outline: none; border-color: var(--accent); }
         textarea.form-control { min-height: 100px; resize: vertical; }
-        
-        /* Toggle */
         .toggle-row {
             display: flex;
             justify-content: space-between;
@@ -171,8 +204,6 @@
             transition: transform 0.2s;
         }
         .toggle.active::after { transform: translateX(22px); }
-        
-        /* Study View */
         .study-header {
             display: flex;
             justify-content: space-between;
@@ -194,8 +225,6 @@
             border-radius: 3px;
             transition: width 0.3s;
         }
-        
-        /* Flashcard */
         .flashcard {
             background: var(--card-bg);
             border-radius: 20px;
@@ -215,14 +244,10 @@
         .flashcard-divider { width: 60px; height: 2px; background: rgba(255,255,255,0.3); margin: 16px 0; }
         .flashcard-answer { font-size: 18px; color: var(--success); }
         .flashcard-hint { font-size: 13px; color: var(--text-muted); margin-top: 20px; }
-        
-        /* Type Input */
         .type-container { width: 100%; margin-top: 16px; }
         .type-result { margin-top: 16px; text-align: center; }
         .type-result .correct { color: var(--success); }
         .type-result .wrong { color: var(--danger); }
-        
-        /* SRS Buttons */
         .srs-buttons {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -242,8 +267,81 @@
         .srs-btn.hard { background: var(--warning); color: #000; }
         .srs-btn.good { background: var(--success); }
         .srs-btn.easy { background: var(--info); }
-        
-        /* Modal */
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .help-section {
+            margin-bottom: 16px;
+        }
+        .help-section:last-child {
+            margin-bottom: 0;
+        }
+        .help-section h4 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--accent);
+        }
+        .help-section p {
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text-muted);
+        }
+        .help-section code {
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .help-list {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 0 0;
+        }
+        .help-list li {
+            font-size: 13px;
+            color: var(--text-muted);
+            padding: 6px 0;
+            line-height: 1.5;
+        }
+        .badge-inline {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-right: 4px;
+        }
+        .badge-inline.again { background: var(--danger); color: white; }
+        .badge-inline.hard { background: var(--warning); color: #000; }
+        .badge-inline.good { background: var(--success); color: white; }
+        .badge-inline.easy { background: var(--info); color: white; }
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .shortcut {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .shortcut kbd {
+            background: rgba(0,0,0,0.3);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -273,8 +371,6 @@
             margin-bottom: 20px;
         }
         .modal-header h3 { font-size: 18px; }
-        
-        /* Preview Item */
         .preview-item {
             display: flex;
             align-items: center;
@@ -288,8 +384,6 @@
         .preview-item .info { flex: 1; }
         .preview-item .info h4 { font-size: 14px; margin-bottom: 2px; }
         .preview-item .info p { font-size: 12px; color: var(--text-muted); }
-        
-        /* Card List Item */
         .card-list-item {
             display: flex;
             justify-content: space-between;
@@ -301,27 +395,19 @@
         }
         .card-list-item .card-text { flex: 1; }
         .card-list-item .card-text small { display: block; color: var(--text-muted); font-size: 11px; }
-        
-        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
             color: var(--text-muted);
         }
         .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
-        
-        /* Footer */
         .footer {
             text-align: center;
             padding: 20px;
             color: var(--text-muted);
             font-size: 12px;
         }
-        
-        /* Hidden file input */
         .hidden { display: none; }
-        
-        /* Radio buttons */
         .radio-group { display: flex; gap: 12px; }
         .radio-option {
             flex: 1;
@@ -332,27 +418,37 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-        .radio-option.active {
-            background: var(--accent);
-        }
+        .radio-option.active { background: var(--accent); }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
-            <h1>📚 FlashFrame</h1>
-            <p>Tap cards to flip • Swipe to navigate</p>
+            <div class="header-row">
+                <div class="lang-selector" id="lang-selector">
+                    <button class="lang-btn" id="lang-btn">🇬🇧</button>
+                    <div class="lang-dropdown" id="lang-dropdown">
+                        <div class="lang-option" data-lang="en">🇬🇧 English</div>
+                        <div class="lang-option" data-lang="it">🇮🇹 Italiano</div>
+                        <div class="lang-option" data-lang="vi">🇻🇳 Tiếng Việt</div>
+                        <div class="lang-option" data-lang="zh">🇨🇳 中文</div>
+                        <div class="lang-option" data-lang="ko">🇰🇷 한국어</div>
+                        <div class="lang-option" data-lang="ja">🇯🇵 日本語</div>
+                    </div>
+                </div>
+                <h1>📚 FlashFrame</h1>
+                <div style="width: 36px;"></div>
+            </div>
+            <p id="subtitle">Tap cards to flip • Swipe to navigate</p>
         </div>
         
-        <!-- Tabs -->
         <div class="tabs" id="tabs">
             <button class="tab active" data-tab="decks">Decks</button>
             <button class="tab" data-tab="import">Import</button>
             <button class="tab" data-tab="settings">Settings</button>
+            <button class="tab" data-tab="help">Help</button>
         </div>
         
-        <!-- Decks View -->
         <div class="view active" id="decks-view">
             <div id="decks-list"></div>
             <div class="empty-state" id="empty-state" style="display: none;">
@@ -361,40 +457,35 @@
             </div>
         </div>
         
-        <!-- Import View -->
         <div class="view" id="import-view">
-            <!-- Quick Import -->
             <div class="card">
                 <h3 style="margin-bottom: 16px;">📝 Quick Import</h3>
                 <div class="form-group">
-                    <label>Deck Name</label>
+                    <label for="import-deck-name">Deck Name</label>
                     <input type="text" class="form-control" id="import-deck-name" placeholder="My Deck">
                 </div>
                 <div class="form-group">
-                    <label>Cards (question:answer format)</label>
+                    <label for="import-text">Cards (question:answer format)</label>
                     <textarea class="form-control" id="import-text" placeholder="What is 2+2:4&#10;Capital of France:Paris"></textarea>
                 </div>
-                <button class="btn btn-primary btn-block" onclick="quickImport()">Import Cards</button>
+                <button class="btn btn-primary btn-block" id="btn-import">Import Cards</button>
             </div>
             
-            <!-- Backup & Restore -->
             <div class="card">
                 <h3 style="margin-bottom: 4px;">💾 Backup & Restore</h3>
                 <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Compatible with FlashFrame Android & iOS</p>
-                <button class="btn btn-success btn-block" onclick="exportBackup()" style="margin-bottom: 8px;">📤 Export Backup File</button>
-                <button class="btn btn-secondary btn-block" onclick="document.getElementById('restore-file').click()">📥 Restore from File</button>
-                <input type="file" id="restore-file" class="hidden" accept=".json,application/json" onchange="handleRestoreFile(event)">
+                <button class="btn btn-success btn-block" id="btn-export" style="margin-bottom: 8px;">📤 Export Backup File</button>
+                <button class="btn btn-secondary btn-block" id="btn-restore-pick">📥 Restore from File</button>
+                <input type="file" id="restore-file" class="hidden" accept=".json,application/json">
             </div>
             
-            <!-- Danger Zone -->
             <div class="card card-danger">
                 <h3 style="color: var(--danger); margin-bottom: 4px;">⚠️ Danger Zone</h3>
                 <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">This action cannot be undone</p>
-                <button class="btn btn-danger btn-block" onclick="showResetWarning()">🗑️ Reset All Data</button>
+                <button class="btn btn-danger btn-block" id="btn-reset">🗑️ Reset All Data</button>
             </div>
         </div>
         
-        <!-- Settings View -->
         <div class="view" id="settings-view">
             <div class="card">
                 <div class="toggle-row">
@@ -402,752 +493,1909 @@
                         <h4>SRS Mode</h4>
                         <p>Anki-style spaced repetition</p>
                     </div>
-                    <div class="toggle" id="toggle-srs" onclick="toggleSetting('srs')"></div>
+                    <div class="toggle" id="toggle-srs"></div>
                 </div>
                 <div class="toggle-row">
                     <div class="toggle-info">
                         <h4>Shuffle</h4>
                         <p>Randomize card order</p>
                     </div>
-                    <div class="toggle" id="toggle-shuffle" onclick="toggleSetting('shuffle')"></div>
+                    <div class="toggle" id="toggle-shuffle"></div>
                 </div>
             </div>
             <div class="card">
                 <h4 style="margin-bottom: 12px;">Study Mode</h4>
                 <div class="radio-group">
-                    <div class="radio-option" id="mode-flip" onclick="setStudyMode('flip')">🔄 Flip</div>
-                    <div class="radio-option" id="mode-type" onclick="setStudyMode('type')">⌨️ Type</div>
+                    <div class="radio-option" id="mode-flip">🔄 Flip</div>
+                    <div class="radio-option" id="mode-type">⌨️ Type</div>
                 </div>
             </div>
         </div>
         
-        <!-- Study View -->
+        <!-- Help View -->
+        <div class="view" id="help-view">
+            <div class="card">
+                <h3 id="help-title" style="margin-bottom: 16px;">📖 How to Use FlashFrame</h3>
+                
+                <div class="help-section">
+                    <h4 id="help-getting-started-title">🚀 Getting Started</h4>
+                    <p id="help-getting-started-text">Create your first deck by going to the <strong>Import</strong> tab. Enter a deck name and add cards in the format <code>question:answer</code>, one per line. Click Import to create your deck!</p>
+                </div>
+                
+                <div class="help-section">
+                    <h4 id="help-studying-title">📚 Studying Cards</h4>
+                    <p id="help-studying-text">Tap on any deck to start studying. Tap the card to flip it and reveal the answer. On mobile, swipe left/right to navigate. On PC, use arrow keys (← →) or click the navigation buttons.</p>
+                </div>
+                
+                <div class="help-section">
+                    <h4 id="help-modes-title">🎯 Study Modes</h4>
+                    <p id="help-modes-text"><strong>Flip Mode:</strong> Tap to reveal the answer, then rate yourself.<br><strong>Type Mode:</strong> Type your answer before revealing the correct one.</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 id="help-srs-title" style="margin-bottom: 16px;">🧠 Spaced Repetition System (SRS)</h3>
+                
+                <div class="help-section">
+                    <h4 id="help-what-srs-title">What is SRS?</h4>
+                    <p id="help-what-srs-text">SRS is a scientifically-proven learning technique that shows you cards at optimal intervals. Cards you know well appear less frequently, while difficult cards appear more often. This maximizes retention while minimizing study time.</p>
+                </div>
+                
+                <div class="help-section">
+                    <h4 id="help-how-srs-title">How It Works</h4>
+                    <p id="help-how-srs-text">After viewing a card, rate how well you knew it:</p>
+                    <ul class="help-list">
+                        <li><span class="badge-inline again">Again</span> <span id="help-again-text">- Didn't know it. See again in 1 minute.</span></li>
+                        <li><span class="badge-inline hard">Hard</span> <span id="help-hard-text">- Struggled. Short interval increase.</span></li>
+                        <li><span class="badge-inline good">Good</span> <span id="help-good-text">- Knew it with some effort. Normal interval.</span></li>
+                        <li><span class="badge-inline easy">Easy</span> <span id="help-easy-text">- Knew it instantly. Larger interval boost.</span></li>
+                    </ul>
+                </div>
+                
+                <div class="help-section">
+                    <h4 id="help-learning-title">Learning Phases</h4>
+                    <p id="help-learning-text"><strong>New cards</strong> start in the learning phase with short intervals (1min → 10min). Once you pass these steps, the card "graduates" to the review phase where intervals grow (1 day → 3 days → 1 week → etc). If you forget a card, it goes back to relearning.</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 id="help-tips-title" style="margin-bottom: 16px;">💡 Tips for Success</h3>
+                <ul class="help-list">
+                    <li id="help-tip-1">📅 Study a little every day rather than cramming</li>
+                    <li id="help-tip-2">🎯 Keep cards simple - one concept per card</li>
+                    <li id="help-tip-3">⏰ Review cards when they're due for best results</li>
+                    <li id="help-tip-4">💾 Use Backup to save your progress across devices</li>
+                    <li id="help-tip-5">🔀 Enable Shuffle to avoid pattern memorization</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3 id="help-shortcuts-title" style="margin-bottom: 16px;">⌨️ Keyboard Shortcuts (PC)</h3>
+                <div class="shortcuts-grid">
+                    <div class="shortcut"><kbd>Space</kbd> <span id="help-shortcut-flip">Flip card</span></div>
+                    <div class="shortcut"><kbd>←</kbd> <kbd>→</kbd> <span id="help-shortcut-nav">Navigate cards</span></div>
+                    <div class="shortcut"><kbd>1</kbd> <span id="help-shortcut-again">Again</span></div>
+                    <div class="shortcut"><kbd>2</kbd> <span id="help-shortcut-hard">Hard</span></div>
+                    <div class="shortcut"><kbd>3</kbd> <span id="help-shortcut-good">Good</span></div>
+                    <div class="shortcut"><kbd>4</kbd> <span id="help-shortcut-easy">Easy</span></div>
+                </div>
+            </div>
+        </div>
+        
         <div class="view" id="study-view">
             <div class="study-header">
-                <button class="btn-icon" onclick="exitStudy()">←</button>
+                <button class="btn-icon" id="btn-back">←</button>
                 <h2 id="study-deck-name">Deck</h2>
-                <button class="btn-icon" onclick="shuffleStudyCards()">🔀</button>
+                <button class="btn-icon" id="btn-shuffle-study">🔀</button>
             </div>
             <p class="progress-text" id="progress-text">1 / 10</p>
             <div class="progress-bar">
                 <div class="progress-fill" id="progress-fill"></div>
             </div>
-            <div class="flashcard" id="flashcard" onclick="handleCardClick()">
+            <div class="flashcard" id="flashcard">
                 <div class="flashcard-question" id="card-question">Question</div>
                 <div class="flashcard-divider"></div>
                 <div class="flashcard-answer" id="card-answer" style="display: none;">Answer</div>
                 <div class="type-container" id="type-container" style="display: none;">
                     <input type="text" class="form-control" id="type-input" placeholder="Type your answer...">
-                    <button class="btn btn-primary btn-block" style="margin-top: 12px;" onclick="checkTypedAnswer(event)">Check Answer</button>
+                    <button class="btn btn-primary btn-block" style="margin-top: 12px;" id="btn-check">Check Answer</button>
                 </div>
                 <div class="type-result" id="type-result" style="display: none;"></div>
                 <p class="flashcard-hint" id="card-hint">Tap to flip</p>
             </div>
             <div class="srs-buttons" id="srs-buttons" style="display: none;">
-                <button class="srs-btn again" onclick="rateCard('again')">Again<br><span id="interval-again">1m</span></button>
-                <button class="srs-btn hard" onclick="rateCard('hard')">Hard<br><span id="interval-hard">6m</span></button>
-                <button class="srs-btn good" onclick="rateCard('good')">Good<br><span id="interval-good">10m</span></button>
-                <button class="srs-btn easy" onclick="rateCard('easy')">Easy<br><span id="interval-easy">4d</span></button>
+                <button class="srs-btn again" data-rating="again">Again<br><span id="interval-again">1m</span></button>
+                <button class="srs-btn hard" data-rating="hard">Hard<br><span id="interval-hard">6m</span></button>
+                <button class="srs-btn good" data-rating="good">Good<br><span id="interval-good">10m</span></button>
+                <button class="srs-btn easy" data-rating="easy">Easy<br><span id="interval-easy">4d</span></button>
+            </div>
+            
+            <!-- Navigation buttons (shown when SRS disabled) -->
+            <div class="nav-buttons" id="nav-buttons" style="display: none;">
+                <button class="btn btn-secondary" id="btn-prev" style="flex: 1;">← Previous</button>
+                <button class="btn btn-primary" id="btn-next" style="flex: 1;">Next →</button>
             </div>
         </div>
         
-        <!-- Footer -->
         <div class="footer">Made by Daniel J. with ♡ • v1.7</div>
     </div>
     
-    <!-- Modals container -->
     <div id="modals"></div>
 
-    <script>
-        // ========== STATE ==========
-        let decks = {};
-        let settings = {
-            srsEnabled: true,
-            shuffleEnabled: false,
-            typeModeEnabled: false
+<script>
+(function() {
+    // ========== TRANSLATIONS ==========
+    var translations = {
+        en: {
+            subtitle: "Tap cards to flip • Swipe to navigate",
+            tabDecks: "Decks",
+            tabImport: "Import",
+            tabSettings: "Settings",
+            tabHelp: "Help",
+            emptyState: "No decks yet!\nImport some flashcards to get started.",
+            cardsCount: "cards",
+            due: "due",
+            done: "✓ Done",
+            quickImport: "📝 Quick Import",
+            deckName: "Deck Name",
+            deckNamePlaceholder: "My Deck",
+            cardsFormat: "Cards (question:answer format)",
+            cardsPlaceholder: "What is 2+2:4\nCapital of France:Paris",
+            importBtn: "Import Cards",
+            backupRestore: "💾 Backup & Restore",
+            backupCompat: "Compatible with FlashFrame Android & iOS",
+            exportBtn: "📤 Export Backup File",
+            restoreBtn: "📥 Restore from File",
+            dangerZone: "⚠️ Danger Zone",
+            dangerText: "This action cannot be undone",
+            resetBtn: "🗑️ Reset All Data",
+            srsMode: "SRS Mode",
+            srsDesc: "Anki-style spaced repetition",
+            shuffle: "Shuffle",
+            shuffleDesc: "Randomize card order",
+            studyMode: "Study Mode",
+            flip: "🔄 Flip",
+            type: "⌨️ Type",
+            tapToFlip: "Tap to flip",
+            rateAnswer: "Rate your answer",
+            typeAnswer: "Type your answer",
+            useArrows: "Use ← → to navigate",
+            tapAndNav: "Tap to flip • ← → to navigate",
+            allDone: "🎉 All done!",
+            noMoreCards: "No more cards",
+            checkAnswer: "Check Answer",
+            previous: "← Previous",
+            next: "Next →",
+            again: "Again",
+            hard: "Hard",
+            good: "Good",
+            easy: "Easy",
+            addCard: "+ Add Card",
+            deleteDeck: "Delete Deck",
+            cardsInDeck: "Cards in this deck:",
+            noCardsYet: "No cards yet",
+            addCardTitle: "➕ Add Card to",
+            question: "Question",
+            questionPlaceholder: "Enter question...",
+            answer: "Answer",
+            answerPlaceholder: "Enter answer...",
+            cancel: "Cancel",
+            add: "Add Card",
+            deleteConfirmTitle: "⚠️ Delete Deck",
+            deleteConfirmText: "Are you sure you want to delete",
+            deleteConfirmWarn: "This will permanently delete all",
+            cardsWord: "cards",
+            cannotUndo: "This cannot be undone!",
+            yesDelete: "Yes, Delete",
+            resetTitle: "⚠️ Reset All Data",
+            resetText: "This will permanently delete ALL your decks, cards, and progress.",
+            youHave: "You have",
+            decksWord: "decks",
+            with: "with",
+            totalCards: "total cards",
+            resetEverything: "Reset Everything",
+            previewTitle: "📥 Backup Preview",
+            found: "Found",
+            deckWord: "deck",
+            rename: "Rename",
+            new: "New",
+            duplicateNote: "💡 Duplicate deck names will be renamed automatically",
+            restoreBackup: "Restore Backup",
+            restored: "✅ Restored",
+            imported: "Imported",
+            to: "to",
+            noCardsInDeck: "No cards in this deck!",
+            noCardsDue: "No cards due!",
+            enterCards: "Enter some cards to import",
+            noValidCards: "No valid cards found. Use format: question:answer",
+            fillBothFields: "Please fill both fields",
+            noDeckSelected: "Error: No deck selected",
+            dataReset: "🗑️ All data has been reset",
+            invalidBackup: "Invalid backup file",
+            yourAnswer: "Your answer:",
+            correct: "Correct:",
+            // Help page
+            helpTitle: "📖 How to Use FlashFrame",
+            helpGettingStartedTitle: "🚀 Getting Started",
+            helpGettingStartedText: "Create your first deck by going to the <strong>Import</strong> tab. Enter a deck name and add cards in the format <code>question:answer</code>, one per line. Click Import to create your deck!",
+            helpStudyingTitle: "📚 Studying Cards",
+            helpStudyingText: "Tap on any deck to start studying. Tap the card to flip it and reveal the answer. On mobile, swipe left/right to navigate. On PC, use arrow keys (← →) or click the navigation buttons.",
+            helpModesTitle: "🎯 Study Modes",
+            helpModesText: "<strong>Flip Mode:</strong> Tap to reveal the answer, then rate yourself.<br><strong>Type Mode:</strong> Type your answer before revealing the correct one.",
+            helpSrsTitle: "🧠 Spaced Repetition System (SRS)",
+            helpWhatSrsTitle: "What is SRS?",
+            helpWhatSrsText: "SRS is a scientifically-proven learning technique that shows you cards at optimal intervals. Cards you know well appear less frequently, while difficult cards appear more often. This maximizes retention while minimizing study time.",
+            helpHowSrsTitle: "How It Works",
+            helpHowSrsText: "After viewing a card, rate how well you knew it:",
+            helpAgainText: "- Didn't know it. See again in 1 minute.",
+            helpHardText: "- Struggled. Short interval increase.",
+            helpGoodText: "- Knew it with some effort. Normal interval.",
+            helpEasyText: "- Knew it instantly. Larger interval boost.",
+            helpLearningTitle: "Learning Phases",
+            helpLearningText: "<strong>New cards</strong> start in the learning phase with short intervals (1min → 10min). Once you pass these steps, the card \"graduates\" to the review phase where intervals grow (1 day → 3 days → 1 week → etc). If you forget a card, it goes back to relearning.",
+            helpTipsTitle: "💡 Tips for Success",
+            helpTip1: "📅 Study a little every day rather than cramming",
+            helpTip2: "🎯 Keep cards simple - one concept per card",
+            helpTip3: "⏰ Review cards when they're due for best results",
+            helpTip4: "💾 Use Backup to save your progress across devices",
+            helpTip5: "🔀 Enable Shuffle to avoid pattern memorization",
+            helpShortcutsTitle: "⌨️ Keyboard Shortcuts (PC)",
+            helpShortcutFlip: "Flip card",
+            helpShortcutNav: "Navigate cards"
+        },
+        it: {
+            subtitle: "Tocca le carte per girarle • Scorri per navigare",
+            tabDecks: "Mazzi",
+            tabImport: "Importa",
+            tabSettings: "Impostazioni",
+            tabHelp: "Aiuto",
+            emptyState: "Nessun mazzo ancora!\nImporta delle flashcard per iniziare.",
+            cardsCount: "carte",
+            due: "da rivedere",
+            done: "✓ Fatto",
+            quickImport: "📝 Importazione Rapida",
+            deckName: "Nome del Mazzo",
+            deckNamePlaceholder: "Il Mio Mazzo",
+            cardsFormat: "Carte (formato domanda:risposta)",
+            cardsPlaceholder: "Quanto fa 2+2:4\nCapitale della Francia:Parigi",
+            importBtn: "Importa Carte",
+            backupRestore: "💾 Backup e Ripristino",
+            backupCompat: "Compatibile con FlashFrame Android e iOS",
+            exportBtn: "📤 Esporta File di Backup",
+            restoreBtn: "📥 Ripristina da File",
+            dangerZone: "⚠️ Zona Pericolosa",
+            dangerText: "Questa azione non può essere annullata",
+            resetBtn: "🗑️ Resetta Tutti i Dati",
+            srsMode: "Modalità SRS",
+            srsDesc: "Ripetizione spaziata stile Anki",
+            shuffle: "Mescola",
+            shuffleDesc: "Ordine casuale delle carte",
+            studyMode: "Modalità Studio",
+            flip: "🔄 Gira",
+            type: "⌨️ Scrivi",
+            tapToFlip: "Tocca per girare",
+            rateAnswer: "Valuta la tua risposta",
+            typeAnswer: "Scrivi la tua risposta",
+            useArrows: "Usa ← → per navigare",
+            tapAndNav: "Tocca per girare • ← → per navigare",
+            allDone: "🎉 Tutto fatto!",
+            noMoreCards: "Nessuna altra carta",
+            checkAnswer: "Verifica Risposta",
+            previous: "← Precedente",
+            next: "Successivo →",
+            again: "Ancora",
+            hard: "Difficile",
+            good: "Bene",
+            easy: "Facile",
+            addCard: "+ Aggiungi Carta",
+            deleteDeck: "Elimina Mazzo",
+            cardsInDeck: "Carte in questo mazzo:",
+            noCardsYet: "Nessuna carta ancora",
+            addCardTitle: "➕ Aggiungi Carta a",
+            question: "Domanda",
+            questionPlaceholder: "Inserisci domanda...",
+            answer: "Risposta",
+            answerPlaceholder: "Inserisci risposta...",
+            cancel: "Annulla",
+            add: "Aggiungi",
+            deleteConfirmTitle: "⚠️ Elimina Mazzo",
+            deleteConfirmText: "Sei sicuro di voler eliminare",
+            deleteConfirmWarn: "Questo eliminerà permanentemente tutte le",
+            cardsWord: "carte",
+            cannotUndo: "Non può essere annullato!",
+            yesDelete: "Sì, Elimina",
+            resetTitle: "⚠️ Resetta Tutti i Dati",
+            resetText: "Questo eliminerà permanentemente TUTTI i tuoi mazzi, carte e progressi.",
+            youHave: "Hai",
+            decksWord: "mazzi",
+            with: "con",
+            totalCards: "carte totali",
+            resetEverything: "Resetta Tutto",
+            previewTitle: "📥 Anteprima Backup",
+            found: "Trovati",
+            deckWord: "mazzo",
+            rename: "Rinomina",
+            new: "Nuovo",
+            duplicateNote: "💡 I nomi duplicati verranno rinominati automaticamente",
+            restoreBackup: "Ripristina Backup",
+            restored: "✅ Ripristinati",
+            imported: "Importate",
+            to: "in",
+            noCardsInDeck: "Nessuna carta in questo mazzo!",
+            noCardsDue: "Nessuna carta da rivedere!",
+            enterCards: "Inserisci delle carte da importare",
+            noValidCards: "Nessuna carta valida trovata. Usa il formato: domanda:risposta",
+            fillBothFields: "Compila entrambi i campi",
+            noDeckSelected: "Errore: Nessun mazzo selezionato",
+            dataReset: "🗑️ Tutti i dati sono stati resettati",
+            invalidBackup: "File di backup non valido",
+            yourAnswer: "La tua risposta:",
+            correct: "Corretto:",
+            helpTitle: "📖 Come Usare FlashFrame",
+            helpGettingStartedTitle: "🚀 Per Iniziare",
+            helpGettingStartedText: "Crea il tuo primo mazzo andando nella scheda <strong>Importa</strong>. Inserisci un nome per il mazzo e aggiungi carte nel formato <code>domanda:risposta</code>, una per riga. Clicca Importa per creare il tuo mazzo!",
+            helpStudyingTitle: "📚 Studiare le Carte",
+            helpStudyingText: "Tocca qualsiasi mazzo per iniziare a studiare. Tocca la carta per girarla e vedere la risposta. Su mobile, scorri a sinistra/destra per navigare. Su PC, usa i tasti freccia (← →) o clicca i pulsanti di navigazione.",
+            helpModesTitle: "🎯 Modalità di Studio",
+            helpModesText: "<strong>Modalità Gira:</strong> Tocca per rivelare la risposta, poi valutati.<br><strong>Modalità Scrivi:</strong> Scrivi la tua risposta prima di vedere quella corretta.",
+            helpSrsTitle: "🧠 Sistema di Ripetizione Spaziata (SRS)",
+            helpWhatSrsTitle: "Cos'è l'SRS?",
+            helpWhatSrsText: "L'SRS è una tecnica di apprendimento scientificamente provata che mostra le carte a intervalli ottimali. Le carte che conosci bene appaiono meno frequentemente, mentre le carte difficili appaiono più spesso. Questo massimizza la ritenzione minimizzando il tempo di studio.",
+            helpHowSrsTitle: "Come Funziona",
+            helpHowSrsText: "Dopo aver visto una carta, valuta quanto bene la conoscevi:",
+            helpAgainText: "- Non la sapevo. Rivedi tra 1 minuto.",
+            helpHardText: "- Ho fatto fatica. Breve aumento dell'intervallo.",
+            helpGoodText: "- La sapevo con un po' di sforzo. Intervallo normale.",
+            helpEasyText: "- La sapevo subito. Grande aumento dell'intervallo.",
+            helpLearningTitle: "Fasi di Apprendimento",
+            helpLearningText: "Le <strong>nuove carte</strong> iniziano nella fase di apprendimento con intervalli brevi (1min → 10min). Una volta superati questi passaggi, la carta \"si diploma\" alla fase di revisione dove gli intervalli crescono (1 giorno → 3 giorni → 1 settimana → ecc). Se dimentichi una carta, torna in riapprendimento.",
+            helpTipsTitle: "💡 Consigli per il Successo",
+            helpTip1: "📅 Studia un po' ogni giorno invece di fare tutto insieme",
+            helpTip2: "🎯 Mantieni le carte semplici - un concetto per carta",
+            helpTip3: "⏰ Rivedi le carte quando sono dovute per migliori risultati",
+            helpTip4: "💾 Usa il Backup per salvare i progressi su più dispositivi",
+            helpTip5: "🔀 Attiva Mescola per evitare la memorizzazione dei pattern",
+            helpShortcutsTitle: "⌨️ Scorciatoie da Tastiera (PC)",
+            helpShortcutFlip: "Gira carta",
+            helpShortcutNav: "Naviga carte"
+        },
+        vi: {
+            subtitle: "Chạm để lật thẻ • Vuốt để điều hướng",
+            tabDecks: "Bộ thẻ",
+            tabImport: "Nhập",
+            tabSettings: "Cài đặt",
+            tabHelp: "Trợ giúp",
+            emptyState: "Chưa có bộ thẻ nào!\nNhập flashcard để bắt đầu.",
+            cardsCount: "thẻ",
+            due: "cần ôn",
+            done: "✓ Xong",
+            quickImport: "📝 Nhập Nhanh",
+            deckName: "Tên Bộ Thẻ",
+            deckNamePlaceholder: "Bộ Thẻ Của Tôi",
+            cardsFormat: "Thẻ (định dạng câu hỏi:câu trả lời)",
+            cardsPlaceholder: "2+2 bằng mấy:4\nThủ đô của Pháp:Paris",
+            importBtn: "Nhập Thẻ",
+            backupRestore: "💾 Sao lưu & Khôi phục",
+            backupCompat: "Tương thích với FlashFrame Android & iOS",
+            exportBtn: "📤 Xuất File Sao Lưu",
+            restoreBtn: "📥 Khôi Phục Từ File",
+            dangerZone: "⚠️ Vùng Nguy Hiểm",
+            dangerText: "Hành động này không thể hoàn tác",
+            resetBtn: "🗑️ Đặt Lại Tất Cả Dữ Liệu",
+            srsMode: "Chế độ SRS",
+            srsDesc: "Lặp lại ngắt quãng kiểu Anki",
+            shuffle: "Xáo trộn",
+            shuffleDesc: "Thứ tự thẻ ngẫu nhiên",
+            studyMode: "Chế Độ Học",
+            flip: "🔄 Lật",
+            type: "⌨️ Gõ",
+            tapToFlip: "Chạm để lật",
+            rateAnswer: "Đánh giá câu trả lời của bạn",
+            typeAnswer: "Gõ câu trả lời của bạn",
+            useArrows: "Dùng ← → để điều hướng",
+            tapAndNav: "Chạm để lật • ← → để điều hướng",
+            allDone: "🎉 Hoàn thành!",
+            noMoreCards: "Không còn thẻ nào",
+            checkAnswer: "Kiểm Tra Đáp Án",
+            previous: "← Trước",
+            next: "Tiếp →",
+            again: "Lại",
+            hard: "Khó",
+            good: "Tốt",
+            easy: "Dễ",
+            addCard: "+ Thêm Thẻ",
+            deleteDeck: "Xóa Bộ Thẻ",
+            cardsInDeck: "Thẻ trong bộ này:",
+            noCardsYet: "Chưa có thẻ nào",
+            addCardTitle: "➕ Thêm Thẻ vào",
+            question: "Câu hỏi",
+            questionPlaceholder: "Nhập câu hỏi...",
+            answer: "Câu trả lời",
+            answerPlaceholder: "Nhập câu trả lời...",
+            cancel: "Hủy",
+            add: "Thêm",
+            deleteConfirmTitle: "⚠️ Xóa Bộ Thẻ",
+            deleteConfirmText: "Bạn có chắc muốn xóa",
+            deleteConfirmWarn: "Điều này sẽ xóa vĩnh viễn tất cả",
+            cardsWord: "thẻ",
+            cannotUndo: "Không thể hoàn tác!",
+            yesDelete: "Có, Xóa",
+            resetTitle: "⚠️ Đặt Lại Tất Cả Dữ Liệu",
+            resetText: "Điều này sẽ xóa vĩnh viễn TẤT CẢ bộ thẻ, thẻ và tiến trình của bạn.",
+            youHave: "Bạn có",
+            decksWord: "bộ thẻ",
+            with: "với",
+            totalCards: "tổng số thẻ",
+            resetEverything: "Đặt Lại Tất Cả",
+            previewTitle: "📥 Xem Trước Sao Lưu",
+            found: "Tìm thấy",
+            deckWord: "bộ thẻ",
+            rename: "Đổi tên",
+            new: "Mới",
+            duplicateNote: "💡 Tên trùng lặp sẽ được đổi tên tự động",
+            restoreBackup: "Khôi Phục Sao Lưu",
+            restored: "✅ Đã khôi phục",
+            imported: "Đã nhập",
+            to: "vào",
+            noCardsInDeck: "Không có thẻ trong bộ này!",
+            noCardsDue: "Không có thẻ cần ôn!",
+            enterCards: "Nhập một số thẻ để nhập",
+            noValidCards: "Không tìm thấy thẻ hợp lệ. Dùng định dạng: câu hỏi:câu trả lời",
+            fillBothFields: "Vui lòng điền cả hai trường",
+            noDeckSelected: "Lỗi: Chưa chọn bộ thẻ",
+            dataReset: "🗑️ Tất cả dữ liệu đã được đặt lại",
+            invalidBackup: "File sao lưu không hợp lệ",
+            yourAnswer: "Câu trả lời của bạn:",
+            correct: "Đúng:",
+            helpTitle: "📖 Cách Sử Dụng FlashFrame",
+            helpGettingStartedTitle: "🚀 Bắt Đầu",
+            helpGettingStartedText: "Tạo bộ thẻ đầu tiên bằng cách vào tab <strong>Nhập</strong>. Nhập tên bộ thẻ và thêm thẻ theo định dạng <code>câu hỏi:câu trả lời</code>, mỗi dòng một thẻ. Nhấn Nhập để tạo bộ thẻ!",
+            helpStudyingTitle: "📚 Học Thẻ",
+            helpStudyingText: "Chạm vào bất kỳ bộ thẻ nào để bắt đầu học. Chạm vào thẻ để lật và xem câu trả lời. Trên điện thoại, vuốt trái/phải để điều hướng. Trên PC, dùng phím mũi tên (← →) hoặc nhấn nút điều hướng.",
+            helpModesTitle: "🎯 Chế Độ Học",
+            helpModesText: "<strong>Chế độ Lật:</strong> Chạm để hiện đáp án, sau đó tự đánh giá.<br><strong>Chế độ Gõ:</strong> Gõ câu trả lời trước khi xem đáp án đúng.",
+            helpSrsTitle: "🧠 Hệ Thống Lặp Lại Ngắt Quãng (SRS)",
+            helpWhatSrsTitle: "SRS là gì?",
+            helpWhatSrsText: "SRS là kỹ thuật học tập được chứng minh khoa học, hiển thị thẻ theo khoảng thời gian tối ưu. Thẻ bạn biết rõ xuất hiện ít hơn, trong khi thẻ khó xuất hiện nhiều hơn. Điều này tối đa hóa ghi nhớ trong khi giảm thiểu thời gian học.",
+            helpHowSrsTitle: "Cách Hoạt Động",
+            helpHowSrsText: "Sau khi xem thẻ, đánh giá mức độ bạn biết:",
+            helpAgainText: "- Không biết. Xem lại sau 1 phút.",
+            helpHardText: "- Khó khăn. Tăng khoảng cách ngắn.",
+            helpGoodText: "- Biết với một chút nỗ lực. Khoảng cách bình thường.",
+            helpEasyText: "- Biết ngay lập tức. Tăng khoảng cách lớn.",
+            helpLearningTitle: "Giai Đoạn Học",
+            helpLearningText: "<strong>Thẻ mới</strong> bắt đầu trong giai đoạn học với khoảng cách ngắn (1 phút → 10 phút). Sau khi vượt qua các bước này, thẻ \"tốt nghiệp\" sang giai đoạn ôn tập với khoảng cách tăng dần (1 ngày → 3 ngày → 1 tuần → v.v.). Nếu bạn quên một thẻ, nó quay lại học lại.",
+            helpTipsTitle: "💡 Mẹo Thành Công",
+            helpTip1: "📅 Học một chút mỗi ngày thay vì nhồi nhét",
+            helpTip2: "🎯 Giữ thẻ đơn giản - một khái niệm mỗi thẻ",
+            helpTip3: "⏰ Ôn thẻ khi đến hạn để có kết quả tốt nhất",
+            helpTip4: "💾 Dùng Sao lưu để lưu tiến trình trên nhiều thiết bị",
+            helpTip5: "🔀 Bật Xáo trộn để tránh ghi nhớ theo mẫu",
+            helpShortcutsTitle: "⌨️ Phím Tắt (PC)",
+            helpShortcutFlip: "Lật thẻ",
+            helpShortcutNav: "Điều hướng thẻ"
+        },
+        zh: {
+            subtitle: "点击翻转卡片 • 滑动导航",
+            tabDecks: "卡组",
+            tabImport: "导入",
+            tabSettings: "设置",
+            tabHelp: "帮助",
+            emptyState: "还没有卡组！\n导入一些闪卡开始学习。",
+            cardsCount: "张卡片",
+            due: "待复习",
+            done: "✓ 完成",
+            quickImport: "📝 快速导入",
+            deckName: "卡组名称",
+            deckNamePlaceholder: "我的卡组",
+            cardsFormat: "卡片（问题:答案 格式）",
+            cardsPlaceholder: "2+2等于多少:4\n法国首都:巴黎",
+            importBtn: "导入卡片",
+            backupRestore: "💾 备份与恢复",
+            backupCompat: "兼容 FlashFrame Android 和 iOS",
+            exportBtn: "📤 导出备份文件",
+            restoreBtn: "📥 从文件恢复",
+            dangerZone: "⚠️ 危险区域",
+            dangerText: "此操作无法撤销",
+            resetBtn: "🗑️ 重置所有数据",
+            srsMode: "SRS 模式",
+            srsDesc: "Anki 式间隔重复",
+            shuffle: "随机",
+            shuffleDesc: "随机卡片顺序",
+            studyMode: "学习模式",
+            flip: "🔄 翻转",
+            type: "⌨️ 输入",
+            tapToFlip: "点击翻转",
+            rateAnswer: "评价你的答案",
+            typeAnswer: "输入你的答案",
+            useArrows: "使用 ← → 导航",
+            tapAndNav: "点击翻转 • ← → 导航",
+            allDone: "🎉 全部完成！",
+            noMoreCards: "没有更多卡片",
+            checkAnswer: "检查答案",
+            previous: "← 上一张",
+            next: "下一张 →",
+            again: "重来",
+            hard: "困难",
+            good: "良好",
+            easy: "简单",
+            addCard: "+ 添加卡片",
+            deleteDeck: "删除卡组",
+            cardsInDeck: "此卡组中的卡片：",
+            noCardsYet: "还没有卡片",
+            addCardTitle: "➕ 添加卡片到",
+            question: "问题",
+            questionPlaceholder: "输入问题...",
+            answer: "答案",
+            answerPlaceholder: "输入答案...",
+            cancel: "取消",
+            add: "添加",
+            deleteConfirmTitle: "⚠️ 删除卡组",
+            deleteConfirmText: "你确定要删除",
+            deleteConfirmWarn: "这将永久删除所有",
+            cardsWord: "张卡片",
+            cannotUndo: "无法撤销！",
+            yesDelete: "是的，删除",
+            resetTitle: "⚠️ 重置所有数据",
+            resetText: "这将永久删除你所有的卡组、卡片和进度。",
+            youHave: "你有",
+            decksWord: "个卡组",
+            with: "包含",
+            totalCards: "张卡片",
+            resetEverything: "重置所有",
+            previewTitle: "📥 备份预览",
+            found: "找到",
+            deckWord: "个卡组",
+            rename: "重命名",
+            new: "新建",
+            duplicateNote: "💡 重复的名称将自动重命名",
+            restoreBackup: "恢复备份",
+            restored: "✅ 已恢复",
+            imported: "已导入",
+            to: "到",
+            noCardsInDeck: "此卡组中没有卡片！",
+            noCardsDue: "没有待复习的卡片！",
+            enterCards: "输入一些卡片来导入",
+            noValidCards: "未找到有效卡片。使用格式：问题:答案",
+            fillBothFields: "请填写两个字段",
+            noDeckSelected: "错误：未选择卡组",
+            dataReset: "🗑️ 所有数据已重置",
+            invalidBackup: "无效的备份文件",
+            yourAnswer: "你的答案：",
+            correct: "正确：",
+            helpTitle: "📖 如何使用 FlashFrame",
+            helpGettingStartedTitle: "🚀 开始使用",
+            helpGettingStartedText: "前往<strong>导入</strong>标签创建你的第一个卡组。输入卡组名称，按<code>问题:答案</code>格式添加卡片，每行一张。点击导入创建卡组！",
+            helpStudyingTitle: "📚 学习卡片",
+            helpStudyingText: "点击任何卡组开始学习。点击卡片翻转查看答案。在手机上，左右滑动导航。在电脑上，使用方向键（← →）或点击导航按钮。",
+            helpModesTitle: "🎯 学习模式",
+            helpModesText: "<strong>翻转模式：</strong>点击显示答案，然后自我评价。<br><strong>输入模式：</strong>在显示正确答案前输入你的答案。",
+            helpSrsTitle: "🧠 间隔重复系统（SRS）",
+            helpWhatSrsTitle: "什么是 SRS？",
+            helpWhatSrsText: "SRS 是一种经科学证明的学习技术，以最佳间隔显示卡片。你熟悉的卡片出现频率较低，而困难的卡片出现更频繁。这在最小化学习时间的同时最大化记忆保持。",
+            helpHowSrsTitle: "工作原理",
+            helpHowSrsText: "查看卡片后，评价你的掌握程度：",
+            helpAgainText: "- 不会。1分钟后再看。",
+            helpHardText: "- 有困难。间隔小幅增加。",
+            helpGoodText: "- 需要一些努力才想起来。正常间隔。",
+            helpEasyText: "- 立刻就知道。间隔大幅增加。",
+            helpLearningTitle: "学习阶段",
+            helpLearningText: "<strong>新卡片</strong>从学习阶段开始，间隔较短（1分钟 → 10分钟）。通过这些步骤后，卡片\"毕业\"进入复习阶段，间隔逐渐增长（1天 → 3天 → 1周 → 等）。如果忘记一张卡片，它会回到重新学习阶段。",
+            helpTipsTitle: "💡 成功秘诀",
+            helpTip1: "📅 每天学一点，而不是临时抱佛脚",
+            helpTip2: "🎯 保持卡片简单 - 每张卡片一个概念",
+            helpTip3: "⏰ 按时复习卡片以获得最佳效果",
+            helpTip4: "💾 使用备份在多设备间保存进度",
+            helpTip5: "🔀 启用随机以避免模式记忆",
+            helpShortcutsTitle: "⌨️ 键盘快捷键（PC）",
+            helpShortcutFlip: "翻转卡片",
+            helpShortcutNav: "导航卡片"
+        },
+        ko: {
+            subtitle: "탭하여 카드 뒤집기 • 스와이프하여 이동",
+            tabDecks: "덱",
+            tabImport: "가져오기",
+            tabSettings: "설정",
+            tabHelp: "도움말",
+            emptyState: "아직 덱이 없습니다!\n플래시카드를 가져와서 시작하세요.",
+            cardsCount: "카드",
+            due: "복습 필요",
+            done: "✓ 완료",
+            quickImport: "📝 빠른 가져오기",
+            deckName: "덱 이름",
+            deckNamePlaceholder: "내 덱",
+            cardsFormat: "카드 (질문:답변 형식)",
+            cardsPlaceholder: "2+2는:4\n프랑스의 수도:파리",
+            importBtn: "카드 가져오기",
+            backupRestore: "💾 백업 및 복원",
+            backupCompat: "FlashFrame Android 및 iOS와 호환",
+            exportBtn: "📤 백업 파일 내보내기",
+            restoreBtn: "📥 파일에서 복원",
+            dangerZone: "⚠️ 위험 구역",
+            dangerText: "이 작업은 취소할 수 없습니다",
+            resetBtn: "🗑️ 모든 데이터 초기화",
+            srsMode: "SRS 모드",
+            srsDesc: "Anki 스타일 간격 반복",
+            shuffle: "셔플",
+            shuffleDesc: "카드 순서 무작위화",
+            studyMode: "학습 모드",
+            flip: "🔄 뒤집기",
+            type: "⌨️ 입력",
+            tapToFlip: "탭하여 뒤집기",
+            rateAnswer: "답변 평가하기",
+            typeAnswer: "답변을 입력하세요",
+            useArrows: "← → 로 이동",
+            tapAndNav: "탭하여 뒤집기 • ← → 로 이동",
+            allDone: "🎉 모두 완료!",
+            noMoreCards: "더 이상 카드 없음",
+            checkAnswer: "답변 확인",
+            previous: "← 이전",
+            next: "다음 →",
+            again: "다시",
+            hard: "어려움",
+            good: "좋음",
+            easy: "쉬움",
+            addCard: "+ 카드 추가",
+            deleteDeck: "덱 삭제",
+            cardsInDeck: "이 덱의 카드:",
+            noCardsYet: "아직 카드 없음",
+            addCardTitle: "➕ 카드 추가:",
+            question: "질문",
+            questionPlaceholder: "질문 입력...",
+            answer: "답변",
+            answerPlaceholder: "답변 입력...",
+            cancel: "취소",
+            add: "추가",
+            deleteConfirmTitle: "⚠️ 덱 삭제",
+            deleteConfirmText: "정말 삭제하시겠습니까",
+            deleteConfirmWarn: "이 작업은 모든",
+            cardsWord: "카드를 영구 삭제합니다",
+            cannotUndo: "취소할 수 없습니다!",
+            yesDelete: "예, 삭제",
+            resetTitle: "⚠️ 모든 데이터 초기화",
+            resetText: "이 작업은 모든 덱, 카드 및 진행 상황을 영구적으로 삭제합니다.",
+            youHave: "현재",
+            decksWord: "개의 덱과",
+            with: "",
+            totalCards: "개의 총 카드가 있습니다",
+            resetEverything: "모두 초기화",
+            previewTitle: "📥 백업 미리보기",
+            found: "발견:",
+            deckWord: "개의 덱",
+            rename: "이름 변경",
+            new: "새로 만들기",
+            duplicateNote: "💡 중복된 이름은 자동으로 변경됩니다",
+            restoreBackup: "백업 복원",
+            restored: "✅ 복원됨",
+            imported: "가져옴",
+            to: "에",
+            noCardsInDeck: "이 덱에 카드가 없습니다!",
+            noCardsDue: "복습할 카드가 없습니다!",
+            enterCards: "가져올 카드를 입력하세요",
+            noValidCards: "유효한 카드를 찾을 수 없습니다. 형식: 질문:답변",
+            fillBothFields: "두 필드를 모두 입력하세요",
+            noDeckSelected: "오류: 덱이 선택되지 않음",
+            dataReset: "🗑️ 모든 데이터가 초기화되었습니다",
+            invalidBackup: "유효하지 않은 백업 파일",
+            yourAnswer: "당신의 답변:",
+            correct: "정답:",
+            helpTitle: "📖 FlashFrame 사용법",
+            helpGettingStartedTitle: "🚀 시작하기",
+            helpGettingStartedText: "<strong>가져오기</strong> 탭에서 첫 번째 덱을 만드세요. 덱 이름을 입력하고 <code>질문:답변</code> 형식으로 카드를 추가하세요 (한 줄에 하나씩). 가져오기를 클릭하여 덱을 만드세요!",
+            helpStudyingTitle: "📚 카드 학습하기",
+            helpStudyingText: "아무 덱이나 탭하여 학습을 시작하세요. 카드를 탭하여 뒤집고 답변을 확인하세요. 모바일에서는 좌우로 스와이프하여 이동하세요. PC에서는 화살표 키(← →)를 사용하거나 탐색 버튼을 클릭하세요.",
+            helpModesTitle: "🎯 학습 모드",
+            helpModesText: "<strong>뒤집기 모드:</strong> 탭하여 답변을 표시한 후 자가 평가하세요.<br><strong>입력 모드:</strong> 정답을 보기 전에 답변을 입력하세요.",
+            helpSrsTitle: "🧠 간격 반복 시스템 (SRS)",
+            helpWhatSrsTitle: "SRS란?",
+            helpWhatSrsText: "SRS는 과학적으로 입증된 학습 기법으로 최적의 간격으로 카드를 보여줍니다. 잘 아는 카드는 덜 자주, 어려운 카드는 더 자주 나타납니다. 이를 통해 학습 시간을 최소화하면서 기억력을 극대화합니다.",
+            helpHowSrsTitle: "작동 방식",
+            helpHowSrsText: "카드를 본 후 얼마나 잘 알았는지 평가하세요:",
+            helpAgainText: "- 몰랐음. 1분 후 다시 보기.",
+            helpHardText: "- 어려웠음. 짧은 간격 증가.",
+            helpGoodText: "- 약간의 노력으로 알았음. 보통 간격.",
+            helpEasyText: "- 즉시 알았음. 큰 간격 증가.",
+            helpLearningTitle: "학습 단계",
+            helpLearningText: "<strong>새 카드</strong>는 짧은 간격(1분 → 10분)의 학습 단계에서 시작합니다. 이 단계를 통과하면 카드가 복습 단계로 \"졸업\"하여 간격이 늘어납니다(1일 → 3일 → 1주 → 등). 카드를 잊으면 다시 학습으로 돌아갑니다.",
+            helpTipsTitle: "💡 성공 팁",
+            helpTip1: "📅 벼락치기보다 매일 조금씩 학습하세요",
+            helpTip2: "🎯 카드를 간단하게 - 카드당 하나의 개념",
+            helpTip3: "⏰ 최상의 결과를 위해 정해진 시간에 복습하세요",
+            helpTip4: "💾 백업을 사용하여 여러 기기에서 진행 상황 저장",
+            helpTip5: "🔀 패턴 암기를 피하려면 셔플 활성화",
+            helpShortcutsTitle: "⌨️ 키보드 단축키 (PC)",
+            helpShortcutFlip: "카드 뒤집기",
+            helpShortcutNav: "카드 이동"
+        },
+        ja: {
+            subtitle: "タップでカードを裏返す • スワイプで移動",
+            tabDecks: "デッキ",
+            tabImport: "インポート",
+            tabSettings: "設定",
+            tabHelp: "ヘルプ",
+            emptyState: "デッキがありません！\nフラッシュカードをインポートして始めましょう。",
+            cardsCount: "枚",
+            due: "復習",
+            done: "✓ 完了",
+            quickImport: "📝 クイックインポート",
+            deckName: "デッキ名",
+            deckNamePlaceholder: "マイデッキ",
+            cardsFormat: "カード（質問:答え 形式）",
+            cardsPlaceholder: "2+2は:4\nフランスの首都:パリ",
+            importBtn: "カードをインポート",
+            backupRestore: "💾 バックアップと復元",
+            backupCompat: "FlashFrame Android & iOS と互換性あり",
+            exportBtn: "📤 バックアップファイルを出力",
+            restoreBtn: "📥 ファイルから復元",
+            dangerZone: "⚠️ 危険ゾーン",
+            dangerText: "この操作は取り消せません",
+            resetBtn: "🗑️ 全データをリセット",
+            srsMode: "SRSモード",
+            srsDesc: "Anki式の間隔反復",
+            shuffle: "シャッフル",
+            shuffleDesc: "カードの順序をランダム化",
+            studyMode: "学習モード",
+            flip: "🔄 めくる",
+            type: "⌨️ 入力",
+            tapToFlip: "タップして裏返す",
+            rateAnswer: "回答を評価してください",
+            typeAnswer: "答えを入力してください",
+            useArrows: "← → で移動",
+            tapAndNav: "タップして裏返す • ← → で移動",
+            allDone: "🎉 完了！",
+            noMoreCards: "カードがありません",
+            checkAnswer: "答えを確認",
+            previous: "← 前へ",
+            next: "次へ →",
+            again: "もう一度",
+            hard: "難しい",
+            good: "良い",
+            easy: "簡単",
+            addCard: "+ カード追加",
+            deleteDeck: "デッキを削除",
+            cardsInDeck: "このデッキのカード：",
+            noCardsYet: "カードがありません",
+            addCardTitle: "➕ カードを追加：",
+            question: "質問",
+            questionPlaceholder: "質問を入力...",
+            answer: "答え",
+            answerPlaceholder: "答えを入力...",
+            cancel: "キャンセル",
+            add: "追加",
+            deleteConfirmTitle: "⚠️ デッキを削除",
+            deleteConfirmText: "本当に削除しますか",
+            deleteConfirmWarn: "これにより全ての",
+            cardsWord: "枚のカードが完全に削除されます",
+            cannotUndo: "取り消しできません！",
+            yesDelete: "はい、削除",
+            resetTitle: "⚠️ 全データをリセット",
+            resetText: "これにより全てのデッキ、カード、進捗が完全に削除されます。",
+            youHave: "現在",
+            decksWord: "個のデッキと",
+            with: "",
+            totalCards: "枚のカードがあります",
+            resetEverything: "全てリセット",
+            previewTitle: "📥 バックアッププレビュー",
+            found: "発見：",
+            deckWord: "個のデッキ",
+            rename: "名前変更",
+            new: "新規",
+            duplicateNote: "💡 重複した名前は自動的に変更されます",
+            restoreBackup: "バックアップを復元",
+            restored: "✅ 復元完了",
+            imported: "インポート完了",
+            to: "に",
+            noCardsInDeck: "このデッキにカードがありません！",
+            noCardsDue: "復習するカードがありません！",
+            enterCards: "インポートするカードを入力してください",
+            noValidCards: "有効なカードが見つかりません。形式：質問:答え",
+            fillBothFields: "両方のフィールドを入力してください",
+            noDeckSelected: "エラー：デッキが選択されていません",
+            dataReset: "🗑️ 全データがリセットされました",
+            invalidBackup: "無効なバックアップファイル",
+            yourAnswer: "あなたの答え：",
+            correct: "正解：",
+            helpTitle: "📖 FlashFrameの使い方",
+            helpGettingStartedTitle: "🚀 はじめに",
+            helpGettingStartedText: "<strong>インポート</strong>タブで最初のデッキを作成します。デッキ名を入力し、<code>質問:答え</code>形式でカードを追加します（1行に1枚）。インポートをクリックしてデッキを作成！",
+            helpStudyingTitle: "📚 カードを学習する",
+            helpStudyingText: "任意のデッキをタップして学習を開始します。カードをタップして裏返し、答えを確認します。モバイルでは左右にスワイプして移動。PCでは矢印キー（← →）またはナビゲーションボタンをクリック。",
+            helpModesTitle: "🎯 学習モード",
+            helpModesText: "<strong>めくるモード：</strong>タップして答えを表示し、自己評価。<br><strong>入力モード：</strong>正解を見る前に答えを入力。",
+            helpSrsTitle: "🧠 間隔反復システム（SRS）",
+            helpWhatSrsTitle: "SRSとは？",
+            helpWhatSrsText: "SRSは科学的に証明された学習技術で、最適な間隔でカードを表示します。よく知っているカードは頻度が減り、難しいカードはより頻繁に表示されます。これにより学習時間を最小限に抑えながら記憶を最大化します。",
+            helpHowSrsTitle: "仕組み",
+            helpHowSrsText: "カードを見た後、どの程度覚えていたか評価します：",
+            helpAgainText: "- 覚えていなかった。1分後に再表示。",
+            helpHardText: "- 難しかった。間隔を少し延長。",
+            helpGoodText: "- 少し努力して思い出せた。通常の間隔。",
+            helpEasyText: "- すぐに分かった。間隔を大きく延長。",
+            helpLearningTitle: "学習フェーズ",
+            helpLearningText: "<strong>新しいカード</strong>は短い間隔（1分→10分）の学習フェーズから始まります。これらのステップを通過すると、カードは復習フェーズに「卒業」し、間隔が伸びていきます（1日→3日→1週間→など）。カードを忘れると、再学習に戻ります。",
+            helpTipsTitle: "💡 成功のコツ",
+            helpTip1: "📅 詰め込みより毎日少しずつ学習",
+            helpTip2: "🎯 カードはシンプルに - 1枚1概念",
+            helpTip3: "⏰ 期限通りに復習して最高の結果を",
+            helpTip4: "💾 バックアップで複数デバイスに進捗を保存",
+            helpTip5: "🔀 パターン暗記を避けるためシャッフルを有効に",
+            helpShortcutsTitle: "⌨️ キーボードショートカット（PC）",
+            helpShortcutFlip: "カードを裏返す",
+            helpShortcutNav: "カードを移動"
+        }
+    };
+    
+    var currentLang = 'en';
+    var langFlags = { en: '🇬🇧', it: '🇮🇹', vi: '🇻🇳', zh: '🇨🇳', ko: '🇰🇷', ja: '🇯🇵' };
+    
+    function t(key) {
+        return translations[currentLang][key] || translations['en'][key] || key;
+    }
+    
+    function updateLanguage() {
+        // Update flag button
+        document.getElementById('lang-btn').textContent = langFlags[currentLang];
+        
+        // Update dropdown active state
+        document.querySelectorAll('.lang-option').forEach(function(opt) {
+            opt.classList.toggle('active', opt.getAttribute('data-lang') === currentLang);
+        });
+        
+        // Update UI text
+        document.getElementById('subtitle').textContent = t('subtitle');
+        
+        // Tabs
+        document.querySelector('[data-tab="decks"]').textContent = t('tabDecks');
+        document.querySelector('[data-tab="import"]').textContent = t('tabImport');
+        document.querySelector('[data-tab="settings"]').textContent = t('tabSettings');
+        document.querySelector('[data-tab="help"]').textContent = t('tabHelp');
+        
+        // Import view
+        document.querySelector('#import-view h3').textContent = t('quickImport');
+        document.querySelector('label[for="import-deck-name"]').textContent = t('deckName');
+        document.getElementById('import-deck-name').placeholder = t('deckNamePlaceholder');
+        document.querySelector('label[for="import-text"]').textContent = t('cardsFormat');
+        document.getElementById('import-text').placeholder = t('cardsPlaceholder');
+        document.getElementById('btn-import').textContent = t('importBtn');
+        
+        // Backup section
+        var backupCard = document.querySelectorAll('#import-view .card')[1];
+        backupCard.querySelector('h3').textContent = t('backupRestore');
+        backupCard.querySelector('p').textContent = t('backupCompat');
+        document.getElementById('btn-export').textContent = t('exportBtn');
+        document.getElementById('btn-restore-pick').textContent = t('restoreBtn');
+        
+        // Danger zone
+        var dangerCard = document.querySelectorAll('#import-view .card')[2];
+        dangerCard.querySelector('h3').textContent = t('dangerZone');
+        dangerCard.querySelector('p').textContent = t('dangerText');
+        document.getElementById('btn-reset').textContent = t('resetBtn');
+        
+        // Settings
+        var toggleRows = document.querySelectorAll('#settings-view .toggle-row');
+        toggleRows[0].querySelector('h4').textContent = t('srsMode');
+        toggleRows[0].querySelector('p').textContent = t('srsDesc');
+        toggleRows[1].querySelector('h4').textContent = t('shuffle');
+        toggleRows[1].querySelector('p').textContent = t('shuffleDesc');
+        document.querySelector('#settings-view h4').textContent = t('studyMode');
+        document.getElementById('mode-flip').textContent = t('flip');
+        document.getElementById('mode-type').textContent = t('type');
+        
+        // Study view buttons
+        document.getElementById('btn-prev').textContent = t('previous');
+        document.getElementById('btn-next').textContent = t('next');
+        document.querySelector('.srs-btn.again').innerHTML = t('again') + '<br><span id="interval-again">1m</span>';
+        document.querySelector('.srs-btn.hard').innerHTML = t('hard') + '<br><span id="interval-hard">6m</span>';
+        document.querySelector('.srs-btn.good').innerHTML = t('good') + '<br><span id="interval-good">10m</span>';
+        document.querySelector('.srs-btn.easy').innerHTML = t('easy') + '<br><span id="interval-easy">4d</span>';
+        document.getElementById('btn-check').textContent = t('checkAnswer');
+        
+        // Help page
+        document.getElementById('help-title').textContent = t('helpTitle');
+        document.getElementById('help-getting-started-title').textContent = t('helpGettingStartedTitle');
+        document.getElementById('help-getting-started-text').innerHTML = t('helpGettingStartedText');
+        document.getElementById('help-studying-title').textContent = t('helpStudyingTitle');
+        document.getElementById('help-studying-text').innerHTML = t('helpStudyingText');
+        document.getElementById('help-modes-title').textContent = t('helpModesTitle');
+        document.getElementById('help-modes-text').innerHTML = t('helpModesText');
+        document.getElementById('help-srs-title').textContent = t('helpSrsTitle');
+        document.getElementById('help-what-srs-title').textContent = t('helpWhatSrsTitle');
+        document.getElementById('help-what-srs-text').textContent = t('helpWhatSrsText');
+        document.getElementById('help-how-srs-title').textContent = t('helpHowSrsTitle');
+        document.getElementById('help-how-srs-text').textContent = t('helpHowSrsText');
+        document.getElementById('help-again-text').textContent = t('helpAgainText');
+        document.getElementById('help-hard-text').textContent = t('helpHardText');
+        document.getElementById('help-good-text').textContent = t('helpGoodText');
+        document.getElementById('help-easy-text').textContent = t('helpEasyText');
+        document.getElementById('help-learning-title').textContent = t('helpLearningTitle');
+        document.getElementById('help-learning-text').innerHTML = t('helpLearningText');
+        document.getElementById('help-tips-title').textContent = t('helpTipsTitle');
+        document.getElementById('help-tip-1').textContent = t('helpTip1');
+        document.getElementById('help-tip-2').textContent = t('helpTip2');
+        document.getElementById('help-tip-3').textContent = t('helpTip3');
+        document.getElementById('help-tip-4').textContent = t('helpTip4');
+        document.getElementById('help-tip-5').textContent = t('helpTip5');
+        document.getElementById('help-shortcuts-title').textContent = t('helpShortcutsTitle');
+        document.getElementById('help-shortcut-flip').textContent = t('helpShortcutFlip');
+        document.getElementById('help-shortcut-nav').textContent = t('helpShortcutNav');
+        
+        // Re-render decks to update language
+        renderDecks();
+        
+        // Save language preference
+        localStorage.setItem('flashframe_lang', currentLang);
+    }
+    
+    // ========== STATE ==========
+    var decks = {};
+    var settings = {
+        srsEnabled: true,
+        shuffleEnabled: false,
+        typeModeEnabled: false
+    };
+    
+    var currentDeck = null;
+    var currentCards = [];
+    var currentIndex = 0;
+    var isFlipped = false;
+    var isAnswerRevealed = false;
+    var editingDeck = null;  // Track which deck we're editing
+    
+    // Anki constants
+    var MINUTE = 60 * 1000;
+    var HOUR = 60 * MINUTE;
+    var DAY = 24 * HOUR;
+    var LEARNING_STEPS = [1, 10];
+    var GRADUATING_INTERVAL = 1;
+    var EASY_INTERVAL = 4;
+    var MINIMUM_EASE = 1.3;
+    var EASY_BONUS = 1.3;
+    var HARD_MULTIPLIER = 1.2;
+    
+    // ========== INIT ==========
+    function init() {
+        // Load saved language
+        var savedLang = localStorage.getItem('flashframe_lang');
+        if (savedLang && translations[savedLang]) {
+            currentLang = savedLang;
+        }
+        
+        loadData();
+        setupEventListeners();
+        updateToggles();
+        updateLanguage();
+        renderDecks();
+        setupSwipe();
+        console.log('FlashFrame v1.7 initialized');
+    }
+    
+    function setupEventListeners() {
+        // Language selector
+        document.getElementById('lang-btn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('lang-dropdown').classList.toggle('show');
+        });
+        
+        document.querySelectorAll('.lang-option').forEach(function(opt) {
+            opt.addEventListener('click', function() {
+                currentLang = this.getAttribute('data-lang');
+                document.getElementById('lang-dropdown').classList.remove('show');
+                updateLanguage();
+            });
+        });
+        
+        // Close dropdown when clicking elsewhere
+        document.addEventListener('click', function() {
+            document.getElementById('lang-dropdown').classList.remove('show');
+        });
+        
+        // Tabs
+        document.querySelectorAll('.tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                var tabName = this.getAttribute('data-tab');
+                switchTab(tabName);
+            });
+        });
+        
+        // Import
+        document.getElementById('btn-import').addEventListener('click', quickImport);
+        document.getElementById('btn-export').addEventListener('click', exportBackup);
+        document.getElementById('btn-restore-pick').addEventListener('click', function() {
+            document.getElementById('restore-file').click();
+        });
+        document.getElementById('restore-file').addEventListener('change', handleRestoreFile);
+        document.getElementById('btn-reset').addEventListener('click', showResetWarning);
+        
+        // Settings
+        document.getElementById('toggle-srs').addEventListener('click', function() { toggleSetting('srs'); });
+        document.getElementById('toggle-shuffle').addEventListener('click', function() { toggleSetting('shuffle'); });
+        document.getElementById('mode-flip').addEventListener('click', function() { setStudyMode('flip'); });
+        document.getElementById('mode-type').addEventListener('click', function() { setStudyMode('type'); });
+        
+        // Study
+        document.getElementById('btn-back').addEventListener('click', exitStudy);
+        document.getElementById('btn-shuffle-study').addEventListener('click', shuffleStudyCards);
+        document.getElementById('flashcard').addEventListener('click', handleCardClick);
+        document.getElementById('btn-check').addEventListener('click', checkTypedAnswer);
+        
+        // SRS buttons
+        document.querySelectorAll('.srs-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                rateCard(this.getAttribute('data-rating'));
+            });
+        });
+        
+        // Navigation buttons (when SRS disabled)
+        document.getElementById('btn-prev').addEventListener('click', prevCard);
+        document.getElementById('btn-next').addEventListener('click', nextCard);
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            var studyView = document.getElementById('study-view');
+            if (!studyView.classList.contains('active')) return;
+            
+            if (e.key === 'ArrowLeft') {
+                prevCard();
+            } else if (e.key === 'ArrowRight') {
+                nextCard();
+            } else if (e.key === ' ' || e.key === 'Enter') {
+                // Spacebar or Enter to flip
+                e.preventDefault();
+                handleCardClick();
+            } else if (e.key === '1') {
+                rateCard('again');
+            } else if (e.key === '2') {
+                rateCard('hard');
+            } else if (e.key === '3') {
+                rateCard('good');
+            } else if (e.key === '4') {
+                rateCard('easy');
+            }
+        });
+    }
+    
+    function setupSwipe() {
+        var startX = 0;
+        var flashcard = document.getElementById('flashcard');
+        
+        flashcard.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+        });
+        
+        flashcard.addEventListener('touchend', function(e) {
+            var diff = e.changedTouches[0].clientX - startX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) prevCard();
+                else nextCard();
+            }
+        });
+    }
+    
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+        document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
+        document.querySelector('.tab[data-tab="' + tabName + '"]').classList.add('active');
+        document.getElementById(tabName + '-view').classList.add('active');
+    }
+    
+    // ========== DATA ==========
+    function loadData() {
+        try {
+            var keys = ['flashframe_data', 'flashframe', 'flashcards'];
+            for (var i = 0; i < keys.length; i++) {
+                var saved = localStorage.getItem(keys[i]);
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    if (parsed.decks) {
+                        if (Array.isArray(parsed.decks)) {
+                            decks = {};
+                            parsed.decks.forEach(function(deck) {
+                                if (deck.name && deck.cards) {
+                                    decks[deck.name] = deck.cards.map(normalizeCard);
+                                }
+                            });
+                        } else {
+                            decks = {};
+                            Object.keys(parsed.decks).forEach(function(name) {
+                                if (Array.isArray(parsed.decks[name])) {
+                                    decks[name] = parsed.decks[name].map(normalizeCard);
+                                }
+                            });
+                        }
+                    }
+                    if (parsed.settings) {
+                        settings = Object.assign({}, settings, parsed.settings);
+                    }
+                    if (keys[i] !== 'flashframe_data') saveData();
+                    return;
+                }
+            }
+        } catch (e) {
+            console.error('Load error:', e);
+        }
+    }
+    
+    function normalizeCard(card) {
+        if (!card) return null;
+        return {
+            question: card.question || card.q || card.front || '',
+            answer: card.answer || card.a || card.back || '',
+            interval: card.interval || 0,
+            easeFactor: card.easeFactor || card.ease || 2.5,
+            nextReview: card.nextReview || card.due || Date.now(),
+            phase: card.phase || 'NEW',
+            learningStep: card.learningStep || 0,
+            reviewCount: card.reviewCount || 0
+        };
+    }
+    
+    function saveData() {
+        localStorage.setItem('flashframe_data', JSON.stringify({ decks: decks, settings: settings }));
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    
+    // ========== DECKS ==========
+    function renderDecks() {
+        var list = document.getElementById('decks-list');
+        var empty = document.getElementById('empty-state');
+        var deckNames = Object.keys(decks);
+        
+        // Update empty state text
+        empty.innerHTML = '<div class="icon">📭</div><p>' + t('emptyState').replace('\n', '<br>') + '</p>';
+        
+        if (deckNames.length === 0) {
+            list.innerHTML = '';
+            empty.style.display = 'block';
+            return;
+        }
+        
+        empty.style.display = 'none';
+        list.innerHTML = '';
+        
+        deckNames.forEach(function(name) {
+            var cards = decks[name] || [];
+            var now = Date.now();
+            var dueCount = cards.filter(function(c) { return (c.nextReview || 0) <= now; }).length;
+            
+            var div = document.createElement('div');
+            div.className = 'card deck-item';
+            div.innerHTML = 
+                '<div class="deck-info">' +
+                    '<h3>' + escapeHtml(name) + '</h3>' +
+                    '<p>📚 ' + cards.length + ' ' + t('cardsCount') + '</p>' +
+                '</div>' +
+                '<div class="deck-actions">' +
+                    '<span class="badge ' + (dueCount > 0 ? 'badge-warning' : 'badge-success') + '">' + 
+                        (dueCount > 0 ? dueCount + ' ' + t('due') : t('done')) + 
+                    '</span>' +
+                    '<button class="btn-icon settings-btn">⚙️</button>' +
+                '</div>';
+            
+            // Click on card to study
+            div.addEventListener('click', function(e) {
+                if (!e.target.classList.contains('settings-btn')) {
+                    startStudy(name);
+                }
+            });
+            
+            // Click on settings button
+            div.querySelector('.settings-btn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                showDeckSettings(name);
+            });
+            
+            list.appendChild(div);
+        });
+    }
+    
+    function showDeckSettings(deckName) {
+        editingDeck = deckName;
+        var cards = decks[deckName] || [];
+        
+        var cardsHtml = '';
+        if (cards.length === 0) {
+            cardsHtml = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">' + t('noCardsYet') + '</p>';
+        } else {
+            cards.forEach(function(card, i) {
+                cardsHtml += '<div class="card-list-item" data-index="' + i + '">' +
+                    '<div class="card-text">' +
+                        '<strong>' + escapeHtml(card.question) + '</strong>' +
+                        '<small>' + escapeHtml(card.answer) + '</small>' +
+                    '</div>' +
+                    '<button class="btn btn-danger btn-sm delete-card-btn">🗑️</button>' +
+                '</div>';
+            });
+        }
+        
+        showModal(
+            '<div class="modal-header">' +
+                '<h3>⚙️ ' + escapeHtml(deckName) + '</h3>' +
+                '<button class="btn-icon" id="close-settings-btn">✕</button>' +
+            '</div>' +
+            '<div style="display: flex; gap: 8px; margin-bottom: 16px;">' +
+                '<button class="btn btn-success" id="add-card-btn" style="flex: 1;">' + t('addCard') + '</button>' +
+                '<button class="btn btn-danger" id="delete-deck-btn" style="flex: 1;">' + t('deleteDeck') + '</button>' +
+            '</div>' +
+            '<p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">' + t('cardsInDeck') + '</p>' +
+            '<div style="max-height: 250px; overflow-y: auto;" id="cards-container">' + cardsHtml + '</div>'
+        );
+        
+        // Event listeners for modal buttons
+        document.getElementById('close-settings-btn').onclick = closeModal;
+        
+        document.getElementById('add-card-btn').onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            showAddCardModal();
         };
         
-        let currentDeck = null;
-        let currentCards = [];
-        let currentIndex = 0;
-        let isFlipped = false;
-        let isAnswerRevealed = false;
-        
-        // Anki SM-2 Constants
-        const MINUTE = 60 * 1000;
-        const HOUR = 60 * MINUTE;
-        const DAY = 24 * HOUR;
-        const LEARNING_STEPS = [1, 10]; // minutes
-        const GRADUATING_INTERVAL = 1; // days
-        const EASY_INTERVAL = 4; // days
-        const MINIMUM_EASE = 1.3;
-        const EASY_BONUS = 1.3;
-        const HARD_MULTIPLIER = 1.2;
-        
-        // ========== INIT ==========
-        function init() {
-            loadData();
-            setupTabs();
-            updateToggles();
-            renderDecks();
-            setupSwipe();
-        }
-        
-        function setupTabs() {
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-                    tab.classList.add('active');
-                    document.getElementById(tab.dataset.tab + '-view').classList.add('active');
-                });
-            });
-        }
-        
-        function setupSwipe() {
-            let startX = 0;
-            const flashcard = document.getElementById('flashcard');
-            
-            flashcard.addEventListener('touchstart', e => {
-                startX = e.touches[0].clientX;
-            });
-            
-            flashcard.addEventListener('touchend', e => {
-                const diff = e.changedTouches[0].clientX - startX;
-                if (Math.abs(diff) > 50) {
-                    if (diff > 0) prevCard();
-                    else nextCard();
-                }
-            });
-        }
-        
-        // ========== DATA ==========
-        function loadData() {
-            const saved = localStorage.getItem('flashframe_data');
-            if (saved) {
-                const data = JSON.parse(saved);
-                decks = data.decks || {};
-                settings = { ...settings, ...data.settings };
-            }
-        }
-        
-        function saveData() {
-            localStorage.setItem('flashframe_data', JSON.stringify({ decks, settings }));
-        }
-        
-        // ========== DECKS ==========
-        function renderDecks() {
-            const list = document.getElementById('decks-list');
-            const empty = document.getElementById('empty-state');
-            
-            const deckNames = Object.keys(decks);
-            
-            if (deckNames.length === 0) {
-                list.innerHTML = '';
-                empty.style.display = 'block';
-                return;
-            }
-            
-            empty.style.display = 'none';
-            list.innerHTML = deckNames.map(name => {
-                const cards = decks[name];
-                const dueCount = cards.filter(c => c.nextReview <= Date.now()).length;
-                const badgeClass = dueCount > 0 ? 'badge-warning' : 'badge-success';
-                const badgeText = dueCount > 0 ? `${dueCount} due` : '✓ Done';
-                
-                return `
-                    <div class="card deck-item" onclick="startStudy('${name}')">
-                        <div class="deck-info">
-                            <h3>${name}</h3>
-                            <p>📚 ${cards.length} cards</p>
-                        </div>
-                        <div class="deck-actions">
-                            <span class="badge ${badgeClass}">${badgeText}</span>
-                            <button class="btn-icon" onclick="event.stopPropagation(); showDeckSettings('${name}')">⚙️</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        function showDeckSettings(deckName) {
-            const cards = decks[deckName];
-            const cardsList = cards.map((card, i) => `
-                <div class="card-list-item">
-                    <div class="card-text">
-                        <strong>${card.question}</strong>
-                        <small>${card.answer}</small>
-                    </div>
-                    <button class="btn btn-danger btn-sm" onclick="deleteCard('${deckName}', ${i})">🗑️</button>
-                </div>
-            `).join('') || '<p style="color: var(--text-muted); text-align: center;">No cards yet</p>';
-            
-            showModal(`
-                <div class="modal-header">
-                    <h3>⚙️ ${deckName}</h3>
-                    <button class="btn-icon" onclick="closeModal()">✕</button>
-                </div>
-                <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-                    <button class="btn btn-success" style="flex: 1;" onclick="showAddCardModal('${deckName}')">+ Add Card</button>
-                    <button class="btn btn-danger" style="flex: 1;" onclick="confirmDeleteDeck('${deckName}')">Delete Deck</button>
-                </div>
-                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Cards in this deck:</p>
-                <div style="max-height: 250px; overflow-y: auto;">${cardsList}</div>
-            `);
-        }
-        
-        function showAddCardModal(deckName) {
-            showModal(`
-                <div class="modal-header">
-                    <h3>➕ Add Card</h3>
-                    <button class="btn-icon" onclick="closeModal()">✕</button>
-                </div>
-                <div class="form-group">
-                    <label>Question</label>
-                    <input type="text" class="form-control" id="new-card-q" placeholder="Enter question...">
-                </div>
-                <div class="form-group">
-                    <label>Answer</label>
-                    <input type="text" class="form-control" id="new-card-a" placeholder="Enter answer...">
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn btn-secondary" style="flex: 1;" onclick="showDeckSettings('${deckName}')">Cancel</button>
-                    <button class="btn btn-success" style="flex: 1;" onclick="addCard('${deckName}')">Add Card</button>
-                </div>
-            `);
-        }
-        
-        function addCard(deckName) {
-            const q = document.getElementById('new-card-q').value.trim();
-            const a = document.getElementById('new-card-a').value.trim();
-            
-            if (!q || !a) {
-                alert('Please fill both fields');
-                return;
-            }
-            
-            decks[deckName].push(createCard(q, a));
-            saveData();
-            showDeckSettings(deckName);
-        }
-        
-        function deleteCard(deckName, index) {
-            decks[deckName].splice(index, 1);
-            saveData();
-            showDeckSettings(deckName);
-        }
-        
-        function confirmDeleteDeck(deckName) {
-            if (confirm(`Delete "${deckName}" and all its cards?`)) {
-                delete decks[deckName];
-                saveData();
-                closeModal();
-                renderDecks();
-            }
-        }
-        
-        function createCard(question, answer) {
-            return {
-                question,
-                answer,
-                interval: 0,
-                easeFactor: 2.5,
-                nextReview: Date.now(),
-                phase: 'NEW',
-                learningStep: 0,
-                reviewCount: 0
-            };
-        }
-        
-        // ========== STUDY ==========
-        function startStudy(deckName) {
-            currentDeck = deckName;
-            const cards = decks[deckName];
-            
-            if (settings.srsEnabled) {
-                currentCards = cards.filter(c => c.nextReview <= Date.now());
-            } else {
-                currentCards = [...cards];
-            }
-            
-            if (settings.shuffleEnabled) {
-                currentCards = shuffleArray(currentCards);
-            }
-            
-            if (currentCards.length === 0) {
-                alert('No cards due!');
-                return;
-            }
-            
-            currentIndex = 0;
-            isFlipped = false;
-            isAnswerRevealed = false;
-            
-            document.getElementById('study-deck-name').textContent = deckName;
-            document.getElementById('tabs').style.display = 'none';
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById('study-view').classList.add('active');
-            
-            updateStudyCard();
-        }
-        
-        function exitStudy() {
-            document.getElementById('tabs').style.display = 'flex';
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById('decks-view').classList.add('active');
-            document.querySelector('.tab[data-tab="decks"]').classList.add('active');
-            renderDecks();
-        }
-        
-        function updateStudyCard() {
-            const progressText = document.getElementById('progress-text');
-            const progressFill = document.getElementById('progress-fill');
-            const questionEl = document.getElementById('card-question');
-            const answerEl = document.getElementById('card-answer');
-            const typeContainer = document.getElementById('type-container');
-            const typeResult = document.getElementById('type-result');
-            const hintEl = document.getElementById('card-hint');
-            const srsButtons = document.getElementById('srs-buttons');
-            
-            if (currentIndex >= currentCards.length) {
-                questionEl.textContent = '🎉 All done!';
-                answerEl.style.display = 'none';
-                typeContainer.style.display = 'none';
-                typeResult.style.display = 'none';
-                hintEl.textContent = 'No more cards';
-                srsButtons.style.display = 'none';
-                return;
-            }
-            
-            const card = currentCards[currentIndex];
-            progressText.textContent = `${currentIndex + 1} / ${currentCards.length}`;
-            progressFill.style.width = `${((currentIndex + 1) / currentCards.length) * 100}%`;
-            
-            questionEl.textContent = card.question;
-            answerEl.textContent = card.answer;
-            
-            updateIntervalButtons(card);
-            
-            if (settings.typeModeEnabled) {
-                if (isAnswerRevealed) {
-                    typeContainer.style.display = 'none';
-                    typeResult.style.display = 'block';
-                    answerEl.style.display = 'block';
-                    srsButtons.style.display = settings.srsEnabled ? 'grid' : 'none';
-                    hintEl.textContent = 'Rate your answer';
-                } else {
-                    answerEl.style.display = 'none';
-                    typeContainer.style.display = 'block';
-                    typeResult.style.display = 'none';
-                    srsButtons.style.display = 'none';
-                    hintEl.textContent = 'Type your answer';
-                    document.getElementById('type-input').value = '';
-                }
-            } else {
-                typeContainer.style.display = 'none';
-                typeResult.style.display = 'none';
-                answerEl.style.display = isFlipped ? 'block' : 'none';
-                srsButtons.style.display = (isFlipped && settings.srsEnabled) ? 'grid' : 'none';
-                hintEl.textContent = isFlipped ? 'Rate your answer' : 'Tap to flip';
-            }
-        }
-        
-        function updateIntervalButtons(card) {
-            document.getElementById('interval-again').textContent = formatInterval(getNextInterval(card, 'again'));
-            document.getElementById('interval-hard').textContent = formatInterval(getNextInterval(card, 'hard'));
-            document.getElementById('interval-good').textContent = formatInterval(getNextInterval(card, 'good'));
-            document.getElementById('interval-easy').textContent = formatInterval(getNextInterval(card, 'easy'));
-        }
-        
-        function handleCardClick() {
-            if (settings.typeModeEnabled || currentIndex >= currentCards.length) return;
-            isFlipped = !isFlipped;
-            updateStudyCard();
-        }
-        
-        function checkTypedAnswer(e) {
+        document.getElementById('delete-deck-btn').onclick = function(e) {
+            e.preventDefault();
             e.stopPropagation();
-            if (currentIndex >= currentCards.length) return;
-            
-            const typed = document.getElementById('type-input').value.trim();
-            const correct = currentCards[currentIndex].answer.trim();
-            const isCorrect = typed.toLowerCase() === correct.toLowerCase();
-            
-            document.getElementById('type-result').innerHTML = `
-                <p class="${isCorrect ? 'correct' : 'wrong'}">Your answer: ${typed}</p>
-                <p class="correct">Correct: ${correct}</p>
-            `;
-            
-            isAnswerRevealed = true;
-            updateStudyCard();
+            console.log('Delete clicked!');
+            deleteDeck();
+        };
+        
+        // Delete card buttons
+        document.querySelectorAll('.delete-card-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var index = parseInt(this.parentElement.getAttribute('data-index'));
+                deleteCard(index);
+            });
+        });
+    }
+    
+    function showAddCardModal() {
+        showModal(
+            '<div class="modal-header">' +
+                '<h3>' + t('addCardTitle') + ' ' + escapeHtml(editingDeck) + '</h3>' +
+                '<button class="btn-icon close-modal-btn">✕</button>' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label>' + t('question') + '</label>' +
+                '<input type="text" class="form-control" id="new-card-q" placeholder="' + t('questionPlaceholder') + '">' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label>' + t('answer') + '</label>' +
+                '<input type="text" class="form-control" id="new-card-a" placeholder="' + t('answerPlaceholder') + '">' +
+            '</div>' +
+            '<div style="display: flex; gap: 8px;">' +
+                '<button class="btn btn-secondary cancel-btn" style="flex: 1;">' + t('cancel') + '</button>' +
+                '<button class="btn btn-success confirm-add-btn" style="flex: 1;">' + t('add') + '</button>' +
+            '</div>'
+        );
+        
+        document.querySelector('.close-modal-btn').addEventListener('click', closeModal);
+        document.querySelector('.cancel-btn').addEventListener('click', function() {
+            showDeckSettings(editingDeck);
+        });
+        document.querySelector('.confirm-add-btn').addEventListener('click', function() {
+            addCard();
+        });
+    }
+    
+    function addCard() {
+        var q = document.getElementById('new-card-q').value.trim();
+        var a = document.getElementById('new-card-a').value.trim();
+        
+        if (!q || !a) {
+            alert(t('fillBothFields'));
+            return;
         }
         
-        function nextCard() {
-            if (currentIndex < currentCards.length - 1) {
-                currentIndex++;
-                isFlipped = false;
-                isAnswerRevealed = false;
-                updateStudyCard();
-            }
+        if (!editingDeck) {
+            alert(t('noDeckSelected'));
+            return;
         }
         
-        function prevCard() {
-            if (currentIndex > 0) {
-                currentIndex--;
-                isFlipped = false;
-                isAnswerRevealed = false;
-                updateStudyCard();
-            }
+        if (!decks[editingDeck]) {
+            decks[editingDeck] = [];
         }
         
-        function shuffleStudyCards() {
+        decks[editingDeck].push({
+            question: q,
+            answer: a,
+            interval: 0,
+            easeFactor: 2.5,
+            nextReview: Date.now(),
+            phase: 'NEW',
+            learningStep: 0,
+            reviewCount: 0
+        });
+        
+        saveData();
+        showDeckSettings(editingDeck);
+    }
+    
+    function deleteCard(index) {
+        if (!editingDeck || !decks[editingDeck]) return;
+        decks[editingDeck].splice(index, 1);
+        saveData();
+        showDeckSettings(editingDeck);
+    }
+    
+    function deleteDeck() {
+        console.log('deleteDeck called, editingDeck =', editingDeck);
+        
+        if (!editingDeck) {
+            alert(t('noDeckSelected'));
+            return;
+        }
+        
+        var name = editingDeck;
+        var count = (decks[name] || []).length;
+        
+        // Show custom confirmation modal
+        showModal(
+            '<div class="modal-header">' +
+                '<h3>' + t('deleteConfirmTitle') + '</h3>' +
+                '<button class="btn-icon" id="close-confirm-btn">✕</button>' +
+            '</div>' +
+            '<p style="margin-bottom: 16px;">' + t('deleteConfirmText') + ' <strong>"' + escapeHtml(name) + '"</strong>?</p>' +
+            '<p style="color: var(--danger); margin-bottom: 20px;">' + t('deleteConfirmWarn') + ' ' + count + ' ' + t('cardsWord') + '. ' + t('cannotUndo') + '</p>' +
+            '<div style="display: flex; gap: 8px;">' +
+                '<button class="btn btn-secondary" id="cancel-delete-btn" style="flex: 1;">' + t('cancel') + '</button>' +
+                '<button class="btn btn-danger" id="confirm-delete-btn" style="flex: 1;">' + t('yesDelete') + '</button>' +
+            '</div>'
+        );
+        
+        document.getElementById('close-confirm-btn').onclick = function() {
+            showDeckSettings(editingDeck);
+        };
+        document.getElementById('cancel-delete-btn').onclick = function() {
+            showDeckSettings(editingDeck);
+        };
+        document.getElementById('confirm-delete-btn').onclick = function() {
+            console.log('Confirming delete of:', name);
+            delete decks[name];
+            saveData();
+            editingDeck = null;
+            closeModal();
+            renderDecks();
+        };
+    }
+    
+    // ========== STUDY ==========
+    function startStudy(deckName) {
+        currentDeck = deckName;
+        var cards = decks[deckName] || [];
+        
+        if (cards.length === 0) {
+            alert(t('noCardsInDeck'));
+            return;
+        }
+        
+        if (settings.srsEnabled) {
+            currentCards = cards.filter(function(c) { return (c.nextReview || 0) <= Date.now(); });
+        } else {
+            currentCards = cards.slice();
+        }
+        
+        if (settings.shuffleEnabled) {
             currentCards = shuffleArray(currentCards);
-            currentIndex = 0;
-            isFlipped = false;
-            isAnswerRevealed = false;
-            updateStudyCard();
         }
         
-        // ========== SRS ALGORITHM ==========
-        function getNextInterval(card, rating) {
-            const phase = card.phase || 'NEW';
-            
-            if (phase === 'LEARNING' || phase === 'RELEARNING') {
-                switch (rating) {
-                    case 'again': return LEARNING_STEPS[0] * MINUTE;
-                    case 'hard': return LEARNING_STEPS[0] * MINUTE;
-                    case 'good':
-                        const nextStep = card.learningStep + 1;
-                        if (nextStep >= LEARNING_STEPS.length) {
-                            return (phase === 'RELEARNING' ? Math.max(1, card.interval * HARD_MULTIPLIER) : GRADUATING_INTERVAL) * DAY;
-                        }
-                        return LEARNING_STEPS[nextStep] * MINUTE;
-                    case 'easy': return EASY_INTERVAL * DAY;
-                }
-            }
-            
-            switch (rating) {
-                case 'again': return LEARNING_STEPS[0] * MINUTE;
-                case 'hard': return Math.max(1, Math.round(card.interval * HARD_MULTIPLIER * card.easeFactor)) * DAY;
-                case 'good': return Math.max(1, Math.round(card.interval * card.easeFactor)) * DAY;
-                case 'easy': return Math.max(1, Math.round(card.interval * card.easeFactor * EASY_BONUS)) * DAY;
-            }
+        if (currentCards.length === 0) {
+            alert(t('noCardsDue'));
+            return;
         }
         
-        function rateCard(rating) {
-            if (currentIndex >= currentCards.length) return;
-            
-            const card = currentCards[currentIndex];
-            const intervalMs = getNextInterval(card, rating);
-            const phase = card.phase || 'NEW';
-            
-            // Update card based on rating
-            if (phase === 'LEARNING' || phase === 'RELEARNING') {
-                switch (rating) {
-                    case 'again': card.learningStep = 0; break;
-                    case 'hard': break;
-                    case 'good':
-                        card.learningStep++;
-                        if (card.learningStep >= LEARNING_STEPS.length) {
-                            card.phase = 'REVIEW';
-                            card.interval = phase === 'RELEARNING' ? Math.max(1, Math.round(card.interval * HARD_MULTIPLIER)) : GRADUATING_INTERVAL;
-                            card.learningStep = 0;
-                        }
-                        break;
-                    case 'easy':
-                        card.phase = 'REVIEW';
-                        card.interval = EASY_INTERVAL;
-                        card.learningStep = 0;
-                        card.easeFactor = Math.max(MINIMUM_EASE, card.easeFactor + 0.15);
-                        break;
-                }
-            } else if (phase === 'REVIEW') {
-                switch (rating) {
-                    case 'again':
-                        card.phase = 'RELEARNING';
-                        card.learningStep = 0;
-                        card.easeFactor = Math.max(MINIMUM_EASE, card.easeFactor - 0.2);
-                        break;
-                    case 'hard':
-                        card.interval = Math.max(1, Math.round(card.interval * HARD_MULTIPLIER * card.easeFactor));
-                        card.easeFactor = Math.max(MINIMUM_EASE, card.easeFactor - 0.15);
-                        break;
-                    case 'good':
-                        card.interval = Math.max(1, Math.round(card.interval * card.easeFactor));
-                        break;
-                    case 'easy':
-                        card.interval = Math.max(1, Math.round(card.interval * card.easeFactor * EASY_BONUS));
-                        card.easeFactor = Math.max(MINIMUM_EASE, card.easeFactor + 0.15);
-                        break;
+        currentIndex = 0;
+        isFlipped = false;
+        isAnswerRevealed = false;
+        
+        document.getElementById('study-deck-name').textContent = deckName;
+        document.getElementById('tabs').style.display = 'none';
+        document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
+        document.getElementById('study-view').classList.add('active');
+        
+        updateStudyCard();
+    }
+    
+    function exitStudy() {
+        document.getElementById('tabs').style.display = 'flex';
+        document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
+        document.getElementById('decks-view').classList.add('active');
+        document.querySelector('.tab[data-tab="decks"]').classList.add('active');
+        renderDecks();
+    }
+    
+    function updateStudyCard() {
+        var questionEl = document.getElementById('card-question');
+        var answerEl = document.getElementById('card-answer');
+        var typeContainer = document.getElementById('type-container');
+        var typeResult = document.getElementById('type-result');
+        var hintEl = document.getElementById('card-hint');
+        var srsButtons = document.getElementById('srs-buttons');
+        var navButtons = document.getElementById('nav-buttons');
+        
+        if (currentIndex >= currentCards.length) {
+            questionEl.textContent = t('allDone');
+            answerEl.style.display = 'none';
+            typeContainer.style.display = 'none';
+            typeResult.style.display = 'none';
+            hintEl.textContent = t('noMoreCards');
+            srsButtons.style.display = 'none';
+            navButtons.style.display = 'none';
+            return;
+        }
+        
+        var card = currentCards[currentIndex];
+        document.getElementById('progress-text').textContent = (currentIndex + 1) + ' / ' + currentCards.length;
+        document.getElementById('progress-fill').style.width = ((currentIndex + 1) / currentCards.length * 100) + '%';
+        
+        questionEl.textContent = card.question;
+        answerEl.textContent = card.answer;
+        
+        updateIntervalButtons(card);
+        
+        // Update prev/next button states
+        document.getElementById('btn-prev').disabled = (currentIndex === 0);
+        document.getElementById('btn-next').disabled = (currentIndex >= currentCards.length - 1);
+        
+        if (settings.typeModeEnabled) {
+            if (isAnswerRevealed) {
+                typeContainer.style.display = 'none';
+                typeResult.style.display = 'block';
+                answerEl.style.display = 'block';
+                if (settings.srsEnabled) {
+                    srsButtons.style.display = 'grid';
+                    navButtons.style.display = 'none';
+                    hintEl.textContent = t('rateAnswer');
+                } else {
+                    srsButtons.style.display = 'none';
+                    navButtons.style.display = 'flex';
+                    hintEl.textContent = t('useArrows');
                 }
             } else {
-                card.phase = 'LEARNING';
-                card.learningStep = 0;
+                answerEl.style.display = 'none';
+                typeContainer.style.display = 'block';
+                typeResult.style.display = 'none';
+                srsButtons.style.display = 'none';
+                navButtons.style.display = 'none';
+                hintEl.textContent = t('typeAnswer');
+                document.getElementById('type-input').value = '';
             }
+        } else {
+            typeContainer.style.display = 'none';
+            typeResult.style.display = 'none';
+            answerEl.style.display = isFlipped ? 'block' : 'none';
             
-            card.nextReview = Date.now() + intervalMs;
-            card.reviewCount++;
-            
-            saveData();
-            
+            if (isFlipped) {
+                if (settings.srsEnabled) {
+                    srsButtons.style.display = 'grid';
+                    navButtons.style.display = 'none';
+                    hintEl.textContent = t('rateAnswer');
+                } else {
+                    srsButtons.style.display = 'none';
+                    navButtons.style.display = 'flex';
+                    hintEl.textContent = t('useArrows');
+                }
+            } else {
+                srsButtons.style.display = 'none';
+                if (settings.srsEnabled) {
+                    navButtons.style.display = 'none';
+                    hintEl.textContent = t('tapToFlip');
+                } else {
+                    navButtons.style.display = 'flex';
+                    hintEl.textContent = t('tapAndNav');
+                }
+            }
+        }
+    }
+    
+    function updateIntervalButtons(card) {
+        document.getElementById('interval-again').textContent = formatInterval(getNextInterval(card, 'again'));
+        document.getElementById('interval-hard').textContent = formatInterval(getNextInterval(card, 'hard'));
+        document.getElementById('interval-good').textContent = formatInterval(getNextInterval(card, 'good'));
+        document.getElementById('interval-easy').textContent = formatInterval(getNextInterval(card, 'easy'));
+    }
+    
+    function handleCardClick() {
+        if (settings.typeModeEnabled || currentIndex >= currentCards.length) return;
+        isFlipped = !isFlipped;
+        updateStudyCard();
+    }
+    
+    function checkTypedAnswer() {
+        if (currentIndex >= currentCards.length) return;
+        
+        var typed = document.getElementById('type-input').value.trim();
+        var correct = currentCards[currentIndex].answer.trim();
+        var isCorrect = typed.toLowerCase() === correct.toLowerCase();
+        
+        document.getElementById('type-result').innerHTML = 
+            '<p class="' + (isCorrect ? 'correct' : 'wrong') + '">' + t('yourAnswer') + ' ' + escapeHtml(typed) + '</p>' +
+            '<p class="correct">' + t('correct') + ' ' + escapeHtml(correct) + '</p>';
+        
+        isAnswerRevealed = true;
+        updateStudyCard();
+    }
+    
+    function nextCard() {
+        if (currentIndex < currentCards.length - 1) {
             currentIndex++;
             isFlipped = false;
             isAnswerRevealed = false;
             updateStudyCard();
         }
-        
-        function formatInterval(ms) {
-            if (ms < HOUR) return Math.round(ms / MINUTE) + 'm';
-            if (ms < DAY) return Math.round(ms / HOUR) + 'h';
-            if (ms < 30 * DAY) return Math.round(ms / DAY) + 'd';
-            if (ms < 365 * DAY) return Math.round(ms / (30 * DAY)) + 'mo';
-            return Math.round(ms / (365 * DAY)) + 'y';
+    }
+    
+    function prevCard() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            isFlipped = false;
+            isAnswerRevealed = false;
+            updateStudyCard();
         }
+    }
+    
+    function shuffleStudyCards() {
+        currentCards = shuffleArray(currentCards);
+        currentIndex = 0;
+        isFlipped = false;
+        isAnswerRevealed = false;
+        updateStudyCard();
+    }
+    
+    // ========== SRS ==========
+    function getNextInterval(card, rating) {
+        var phase = card.phase || 'NEW';
+        var interval = card.interval || 1;
+        var ease = card.easeFactor || 2.5;
+        var step = card.learningStep || 0;
         
-        // ========== QUICK IMPORT ==========
-        function quickImport() {
-            let deckName = document.getElementById('import-deck-name').value.trim() || 'Imported Cards';
-            const text = document.getElementById('import-text').value.trim();
-            
-            if (!text) {
-                alert('Enter some cards to import');
-                return;
+        // NEW cards and LEARNING cards use learning steps
+        if (phase === 'NEW' || phase === 'LEARNING' || phase === 'RELEARNING') {
+            if (rating === 'again') return LEARNING_STEPS[0] * MINUTE;  // 1m
+            if (rating === 'hard') {
+                // Hard = current step again (or slightly longer)
+                return Math.max(1, LEARNING_STEPS[Math.min(step, LEARNING_STEPS.length - 1)] * 1.5) * MINUTE;
             }
-            
-            deckName = getUniqueDeckName(deckName);
-            decks[deckName] = [];
-            
-            let count = 0;
-            text.split('\n').forEach(line => {
-                const parts = line.trim().split(':');
-                if (parts.length >= 2) {
-                    const q = parts[0].trim();
-                    const a = parts.slice(1).join(':').trim();
-                    if (q && a) {
-                        decks[deckName].push(createCard(q, a));
-                        count++;
+            if (rating === 'good') {
+                var nextStep = step + 1;
+                if (nextStep >= LEARNING_STEPS.length) {
+                    // Graduate to review
+                    if (phase === 'RELEARNING') {
+                        return Math.max(1, Math.round(interval * HARD_MULTIPLIER)) * DAY;
                     }
+                    return GRADUATING_INTERVAL * DAY;  // 1 day
                 }
-            });
-            
-            if (count === 0) {
-                delete decks[deckName];
-                alert('No valid cards found. Use format: question:answer');
-                return;
+                return LEARNING_STEPS[nextStep] * MINUTE;  // Next learning step
             }
-            
-            saveData();
-            document.getElementById('import-deck-name').value = '';
-            document.getElementById('import-text').value = '';
-            alert(`Imported ${count} cards to "${deckName}"!`);
-            
-            document.querySelector('.tab[data-tab="decks"]').click();
+            if (rating === 'easy') return EASY_INTERVAL * DAY;  // 4 days (skip learning)
         }
         
-        // ========== FILE BACKUP ==========
-        function exportBackup() {
-            const exportData = {
-                decks: Object.entries(decks).map(([name, cards]) => ({
-                    name,
-                    cards: cards.map(card => ({
-                        question: card.question,
-                        answer: card.answer,
-                        interval: card.interval,
-                        easeFactor: card.easeFactor,
-                        nextReview: card.nextReview,
-                        phase: card.phase || 'NEW',
-                        learningStep: card.learningStep || 0,
-                        reviewCount: card.reviewCount || 0
-                    }))
-                })),
-                settings: settings,
-                exportDate: new Date().toISOString(),
-                version: '1.7'
-            };
-            
-            const json = JSON.stringify(exportData, null, 2);
-            const blob = new Blob([json], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            
-            const date = new Date().toISOString().split('T')[0];
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `FlashFrame_Backup_${date}.json`;
-            a.click();
-            
-            URL.revokeObjectURL(url);
+        // REVIEW cards use the SM-2 algorithm
+        if (rating === 'again') return LEARNING_STEPS[0] * MINUTE;  // Back to 1m
+        if (rating === 'hard') return Math.max(1, Math.round(interval * 1.2)) * DAY;
+        if (rating === 'good') return Math.max(1, Math.round(interval * ease)) * DAY;
+        if (rating === 'easy') return Math.max(1, Math.round(interval * ease * EASY_BONUS)) * DAY;
+        return DAY;
+    }
+    
+    function rateCard(rating) {
+        if (currentIndex >= currentCards.length) return;
+        
+        var card = currentCards[currentIndex];
+        var intervalMs = getNextInterval(card, rating);
+        var phase = card.phase || 'NEW';
+        var interval = card.interval || 1;
+        var ease = card.easeFactor || 2.5;
+        
+        // NEW cards start learning, then process like LEARNING cards
+        if (phase === 'NEW') {
+            card.phase = 'LEARNING';
+            card.learningStep = 0;
+            phase = 'LEARNING';  // Process as learning card below
         }
         
-        function handleRestoreFile(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if (!data.decks || !Array.isArray(data.decks)) {
-                        throw new Error('Invalid backup format');
-                    }
-                    showRestorePreview(data);
-                } catch (err) {
-                    alert('Invalid backup file');
+        if (phase === 'LEARNING' || phase === 'RELEARNING') {
+            if (rating === 'again') {
+                card.learningStep = 0;
+            } else if (rating === 'hard') {
+                // Stay at current step
+            } else if (rating === 'good') {
+                card.learningStep = (card.learningStep || 0) + 1;
+                if (card.learningStep >= LEARNING_STEPS.length) {
+                    // Graduate to review
+                    card.phase = 'REVIEW';
+                    card.interval = phase === 'RELEARNING' ? Math.max(1, Math.round(interval * HARD_MULTIPLIER)) : GRADUATING_INTERVAL;
+                    card.learningStep = 0;
                 }
-            };
-            reader.readAsText(file);
-            event.target.value = '';
+            } else if (rating === 'easy') {
+                // Graduate immediately with easy bonus
+                card.phase = 'REVIEW';
+                card.interval = EASY_INTERVAL;
+                card.learningStep = 0;
+                card.easeFactor = Math.max(MINIMUM_EASE, ease + 0.15);
+            }
+        } else if (phase === 'REVIEW') {
+            if (rating === 'again') {
+                // Lapse - back to relearning
+                card.phase = 'RELEARNING';
+                card.learningStep = 0;
+                card.easeFactor = Math.max(MINIMUM_EASE, ease - 0.2);
+            } else if (rating === 'hard') {
+                card.interval = Math.max(1, Math.round(interval * 1.2));
+                card.easeFactor = Math.max(MINIMUM_EASE, ease - 0.15);
+            } else if (rating === 'good') {
+                card.interval = Math.max(1, Math.round(interval * ease));
+            } else if (rating === 'easy') {
+                card.interval = Math.max(1, Math.round(interval * ease * EASY_BONUS));
+                card.easeFactor = Math.max(MINIMUM_EASE, ease + 0.15);
+            }
         }
         
-        function showRestorePreview(data) {
-            const totalCards = data.decks.reduce((sum, d) => sum + d.cards.length, 0);
-            
-            const deckPreviews = data.decks.map(deck => {
-                const exists = decks.hasOwnProperty(deck.name);
-                return `
-                    <div class="preview-item">
-                        <div class="icon">📚</div>
-                        <div class="info">
-                            <h4>${deck.name}</h4>
-                            <p>${deck.cards.length} cards</p>
-                        </div>
-                        <span class="badge ${exists ? 'badge-warning' : 'badge-success'}">${exists ? 'Rename' : 'New'}</span>
-                    </div>
-                `;
-            }).join('');
-            
-            showModal(`
-                <div class="modal-header">
-                    <h3>📥 Backup Preview</h3>
-                    <button class="btn-icon" onclick="closeModal()">✕</button>
-                </div>
-                <p style="color: var(--success); margin-bottom: 12px;">Found ${data.decks.length} deck${data.decks.length > 1 ? 's' : ''} with ${totalCards} total cards</p>
-                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Decks to import:</p>
-                <div style="max-height: 200px; overflow-y: auto; margin-bottom: 16px;">${deckPreviews}</div>
-                <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px;">💡 Duplicate deck names will be renamed automatically (e.g. 'Japanese' → 'Japanese (1)')</p>
-                <button class="btn btn-success btn-block" onclick='performRestore(${JSON.stringify(data).replace(/'/g, "\\'")})'>Restore Backup</button>
-            `);
+        card.nextReview = Date.now() + intervalMs;
+        card.reviewCount = (card.reviewCount || 0) + 1;
+        
+        saveData();
+        currentIndex++;
+        isFlipped = false;
+        isAnswerRevealed = false;
+        updateStudyCard();
+    }
+    
+    function formatInterval(ms) {
+        if (ms < HOUR) return Math.round(ms / MINUTE) + 'm';
+        if (ms < DAY) return Math.round(ms / HOUR) + 'h';
+        if (ms < 30 * DAY) return Math.round(ms / DAY) + 'd';
+        if (ms < 365 * DAY) return Math.round(ms / (30 * DAY)) + 'mo';
+        return Math.round(ms / (365 * DAY)) + 'y';
+    }
+    
+    // ========== IMPORT ==========
+    function quickImport() {
+        var deckName = document.getElementById('import-deck-name').value.trim() || 'Imported Cards';
+        var text = document.getElementById('import-text').value.trim();
+        
+        if (!text) {
+            alert(t('enterCards'));
+            return;
         }
         
-        function performRestore(data) {
-            let importedDecks = 0;
-            let importedCards = 0;
-            
-            data.decks.forEach(deck => {
-                const finalName = getUniqueDeckName(deck.name);
-                decks[finalName] = deck.cards.map(card => ({
-                    question: card.question,
-                    answer: card.answer,
-                    interval: card.interval || 0,
-                    easeFactor: card.easeFactor || 2.5,
-                    nextReview: card.nextReview || Date.now(),
-                    phase: card.phase || 'NEW',
-                    learningStep: card.learningStep || 0,
-                    reviewCount: card.reviewCount || 0
-                }));
-                importedDecks++;
-                importedCards += deck.cards.length;
+        deckName = getUniqueDeckName(deckName);
+        decks[deckName] = [];
+        
+        var count = 0;
+        text.split('\n').forEach(function(line) {
+            var parts = line.trim().split(':');
+            if (parts.length >= 2) {
+                var q = parts[0].trim();
+                var a = parts.slice(1).join(':').trim();
+                if (q && a) {
+                    decks[deckName].push({
+                        question: q,
+                        answer: a,
+                        interval: 0,
+                        easeFactor: 2.5,
+                        nextReview: Date.now(),
+                        phase: 'NEW',
+                        learningStep: 0,
+                        reviewCount: 0
+                    });
+                    count++;
+                }
+            }
+        });
+        
+        if (count === 0) {
+            delete decks[deckName];
+            alert(t('noValidCards'));
+            return;
+        }
+        
+        saveData();
+        document.getElementById('import-deck-name').value = '';
+        document.getElementById('import-text').value = '';
+        alert(t('imported') + ' ' + count + ' ' + t('cardsCount') + ' ' + t('to') + ' "' + deckName + '"!');
+        switchTab('decks');
+        renderDecks();
+    }
+    
+    // ========== BACKUP ==========
+    function exportBackup() {
+        var exportDecks = [];
+        Object.keys(decks).forEach(function(name) {
+            exportDecks.push({
+                name: name,
+                cards: decks[name].map(function(c) {
+                    return {
+                        question: c.question,
+                        answer: c.answer,
+                        interval: c.interval || 0,
+                        easeFactor: c.easeFactor || 2.5,
+                        nextReview: c.nextReview || Date.now(),
+                        phase: c.phase || 'NEW',
+                        learningStep: c.learningStep || 0,
+                        reviewCount: c.reviewCount || 0
+                    };
+                })
             });
-            
-            if (data.settings) {
-                settings = { ...settings, ...data.settings };
-                updateToggles();
+        });
+        
+        var exportData = {
+            decks: exportDecks,
+            settings: settings,
+            exportDate: new Date().toISOString(),
+            version: '1.7'
+        };
+        
+        var blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'FlashFrame_Backup_' + new Date().toISOString().split('T')[0] + '.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+    
+    function handleRestoreFile(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        
+        var reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                var data = JSON.parse(event.target.result);
+                if (!data.decks || !Array.isArray(data.decks)) {
+                    throw new Error('Invalid format');
+                }
+                showRestorePreview(data);
+            } catch (err) {
+                alert(t('invalidBackup'));
             }
-            
-            saveData();
-            closeModal();
-            renderDecks();
-            alert(`✅ Restored ${importedDecks} decks with ${importedCards} cards!`);
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+    }
+    
+    function showRestorePreview(data) {
+        var totalCards = 0;
+        var previewHtml = '';
+        
+        data.decks.forEach(function(deck) {
+            var cardCount = (deck.cards || []).length;
+            totalCards += cardCount;
+            var exists = decks.hasOwnProperty(deck.name);
+            previewHtml += '<div class="preview-item">' +
+                '<div class="icon">📚</div>' +
+                '<div class="info"><h4>' + escapeHtml(deck.name) + '</h4><p>' + cardCount + ' ' + t('cardsCount') + '</p></div>' +
+                '<span class="badge ' + (exists ? 'badge-warning' : 'badge-success') + '">' + (exists ? t('rename') : t('new')) + '</span>' +
+            '</div>';
+        });
+        
+        window._pendingRestore = data;
+        
+        showModal(
+            '<div class="modal-header"><h3>' + t('previewTitle') + '</h3><button class="btn-icon close-modal-btn">✕</button></div>' +
+            '<p style="color: var(--success); margin-bottom: 12px;">' + t('found') + ' ' + data.decks.length + ' ' + t('deckWord') + ' ' + t('with') + ' ' + totalCards + ' ' + t('totalCards') + '</p>' +
+            '<div style="max-height: 200px; overflow-y: auto; margin-bottom: 16px;">' + previewHtml + '</div>' +
+            '<p style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px;">' + t('duplicateNote') + '</p>' +
+            '<button class="btn btn-success btn-block confirm-restore-btn">' + t('restoreBackup') + '</button>'
+        );
+        
+        document.querySelector('.close-modal-btn').addEventListener('click', closeModal);
+        document.querySelector('.confirm-restore-btn').addEventListener('click', performRestore);
+    }
+    
+    function performRestore() {
+        var data = window._pendingRestore;
+        if (!data) return;
+        
+        var imported = 0;
+        data.decks.forEach(function(deck) {
+            var name = getUniqueDeckName(deck.name);
+            decks[name] = (deck.cards || []).map(normalizeCard);
+            imported++;
+        });
+        
+        if (data.settings) {
+            settings = Object.assign({}, settings, data.settings);
+            updateToggles();
         }
         
-        function getUniqueDeckName(baseName) {
-            if (!decks.hasOwnProperty(baseName)) return baseName;
-            let counter = 1;
-            while (decks.hasOwnProperty(`${baseName} (${counter})`)) {
-                counter++;
-            }
-            return `${baseName} (${counter})`;
-        }
+        saveData();
+        window._pendingRestore = null;
+        closeModal();
+        renderDecks();
+        alert(t('restored') + ' ' + imported + ' ' + t('decksWord') + '!');
+    }
+    
+    function getUniqueDeckName(name) {
+        if (!decks.hasOwnProperty(name)) return name;
+        var i = 1;
+        while (decks.hasOwnProperty(name + ' (' + i + ')')) i++;
+        return name + ' (' + i + ')';
+    }
+    
+    // ========== RESET ==========
+    function showResetWarning() {
+        var deckCount = Object.keys(decks).length;
+        var cardCount = 0;
+        Object.keys(decks).forEach(function(k) { cardCount += decks[k].length; });
         
-        // ========== RESET ==========
-        function showResetWarning() {
-            const deckCount = Object.keys(decks).length;
-            const cardCount = Object.values(decks).reduce((sum, cards) => sum + cards.length, 0);
-            
-            showModal(`
-                <div class="modal-header">
-                    <h3>⚠️ Reset All Data</h3>
-                    <button class="btn-icon" onclick="closeModal()">✕</button>
-                </div>
-                <p style="margin-bottom: 16px;">This will permanently delete ALL your decks, cards, and progress.</p>
-                <p style="color: var(--danger); margin-bottom: 16px;"><strong>You have ${deckCount} decks with ${cardCount} total cards.</strong></p>
-                <p style="margin-bottom: 20px;">This action cannot be undone!</p>
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn btn-secondary" style="flex: 1;" onclick="closeModal()">Cancel</button>
-                    <button class="btn btn-danger" style="flex: 1;" onclick="confirmReset()">Reset Everything</button>
-                </div>
-            `);
-        }
+        showModal(
+            '<div class="modal-header"><h3>' + t('resetTitle') + '</h3><button class="btn-icon close-modal-btn">✕</button></div>' +
+            '<p style="margin-bottom: 16px;">' + t('resetText') + '</p>' +
+            '<p style="color: var(--danger); margin-bottom: 16px;"><strong>' + t('youHave') + ' ' + deckCount + ' ' + t('decksWord') + ' ' + t('with') + ' ' + cardCount + ' ' + t('totalCards') + '.</strong></p>' +
+            '<div style="display: flex; gap: 8px;">' +
+                '<button class="btn btn-secondary cancel-btn" style="flex: 1;">' + t('cancel') + '</button>' +
+                '<button class="btn btn-danger confirm-reset-btn" style="flex: 1;">' + t('resetEverything') + '</button>' +
+            '</div>'
+        );
         
-        function confirmReset() {
+        document.querySelector('.close-modal-btn').addEventListener('click', closeModal);
+        document.querySelector('.cancel-btn').addEventListener('click', closeModal);
+        document.querySelector('.confirm-reset-btn').addEventListener('click', function() {
             decks = {};
             settings = { srsEnabled: true, shuffleEnabled: false, typeModeEnabled: false };
             saveData();
             updateToggles();
             closeModal();
             renderDecks();
-            alert('🗑️ All data has been reset');
+            alert(t('dataReset'));
+        });
+    }
+    
+    // ========== SETTINGS ==========
+    function toggleSetting(setting) {
+        if (setting === 'srs') settings.srsEnabled = !settings.srsEnabled;
+        else if (setting === 'shuffle') settings.shuffleEnabled = !settings.shuffleEnabled;
+        updateToggles();
+        saveData();
+    }
+    
+    function setStudyMode(mode) {
+        settings.typeModeEnabled = (mode === 'type');
+        updateToggles();
+        saveData();
+    }
+    
+    function updateToggles() {
+        document.getElementById('toggle-srs').classList.toggle('active', settings.srsEnabled);
+        document.getElementById('toggle-shuffle').classList.toggle('active', settings.shuffleEnabled);
+        document.getElementById('mode-flip').classList.toggle('active', !settings.typeModeEnabled);
+        document.getElementById('mode-type').classList.toggle('active', settings.typeModeEnabled);
+    }
+    
+    // ========== UTILS ==========
+    function shuffleArray(arr) {
+        var result = arr.slice();
+        for (var i = result.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = result[i];
+            result[i] = result[j];
+            result[j] = temp;
         }
+        return result;
+    }
+    
+    function showModal(content) {
+        document.getElementById('modals').innerHTML = 
+            '<div class="modal-overlay">' +
+                '<div class="modal">' + content + '</div>' +
+            '</div>';
         
-        // ========== SETTINGS ==========
-        function toggleSetting(setting) {
-            if (setting === 'srs') {
-                settings.srsEnabled = !settings.srsEnabled;
-            } else if (setting === 'shuffle') {
-                settings.shuffleEnabled = !settings.shuffleEnabled;
-            }
-            updateToggles();
-            saveData();
-        }
-        
-        function setStudyMode(mode) {
-            settings.typeModeEnabled = mode === 'type';
-            updateToggles();
-            saveData();
-        }
-        
-        function updateToggles() {
-            document.getElementById('toggle-srs').classList.toggle('active', settings.srsEnabled);
-            document.getElementById('toggle-shuffle').classList.toggle('active', settings.shuffleEnabled);
-            document.getElementById('mode-flip').classList.toggle('active', !settings.typeModeEnabled);
-            document.getElementById('mode-type').classList.toggle('active', settings.typeModeEnabled);
-        }
-        
-        // ========== UTILS ==========
-        function shuffleArray(arr) {
-            const result = [...arr];
-            for (let i = result.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [result[i], result[j]] = [result[j], result[i]];
-            }
-            return result;
-        }
-        
-        function showModal(content) {
-            document.getElementById('modals').innerHTML = `
-                <div class="modal-overlay" onclick="closeModal()">
-                    <div class="modal" onclick="event.stopPropagation()">
-                        ${content}
-                    </div>
-                </div>
-            `;
-        }
-        
-        function closeModal() {
-            document.getElementById('modals').innerHTML = '';
-        }
-        
-        // Initialize
-        init();
-    </script>
+        document.querySelector('.modal-overlay').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    }
+    
+    function closeModal() {
+        document.getElementById('modals').innerHTML = '';
+    }
+    
+    // Start
+    init();
+})();
+</script>
 </body>
 </html>
