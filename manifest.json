@@ -1,25 +1,33 @@
 {
-  "name": "FlashFrame",
-  "short_name": "FlashFrame",
-  "description": "A smart flashcard app with spaced repetition, multiple study modes, and easy import. Study smarter, not harder.",
-  "start_url": "/",
-  "scope": "/",
-  "display": "standalone",
-  "background_color": "#4c1d95",
-  "theme_color": "#4c1d95",
-  "orientation": "portrait",
-  "icons": [
-    {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    }
-  ]
+    "name": "FlashFrame - Flashcards",
+    "short_name": "FlashFrame",
+    "description": "Free flashcard app with Anki-style spaced repetition",
+    "id": "flashframe-pwa",
+    "start_url": "./index.html",
+    "scope": "./",
+    "display": "standalone",
+    "background_color": "#1e1b4b",
+    "theme_color": "#1e1b4b",
+    "orientation": "portrait",
+    "categories": ["education", "productivity"],
+    "icons": [
+        {
+            "src": "icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
 }
